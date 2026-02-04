@@ -39,4 +39,8 @@ export class CartoesService {
     return this.repo.abaterPorFuncaoSQL(cartaoId, valor);
   }
 
+  async listarTransacoes(cartaoId: string) {
+    return this.repo.listarTransacoes(cartaoId);
+}
+
 }

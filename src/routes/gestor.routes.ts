@@ -15,3 +15,7 @@ gestorRoutes.patch("/cartoes/:id/status", controller.alterarStatusCartao);
 
 // abater um valor do giftcard, parcial ou total - gestor
 gestorRoutes.post("/cartoes/:id/abater", controller.abaterCartao);
+
+// lista ordenada da mais recente para mais antiga 
+gestorRoutes.get("/cartoes/:id/transacoes", controller.listarTransacoes);
+

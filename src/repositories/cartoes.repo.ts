@@ -82,5 +82,17 @@ export class CartoesRepo {
     saldoAtual: linha.saldo_atual
   };
 }
+
+async listarTransacoes(cartaoId: string) {
+  const { data, error } = await supabase
+    .from("transacoes_cartao_presente")
+    .select("*")
+    .eq("cartao_presente_id", cartaoId)
+    .order("criado_em", { ascending: false });
+
+  if (error) throw new Error(error.message);
+
+  return data ?? [];
+}
 }
 

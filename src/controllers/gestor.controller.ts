@@ -90,4 +90,12 @@ export class GestorController {
     return res.json(resultado);
   }
 
+  async listarTransacoes(req: Request, res: Response) {
+    const cartaoId = req.params.id;
+
+    const transacoes = await service.listarTransacoes(cartaoId);
+
+    return res.json(transacoes);
+}
+
 }
