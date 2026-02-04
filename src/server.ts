@@ -1,15 +1,8 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
+import "dotenv/config";
+import { app } from "./app";
 
-dotenv.config();
+const PORT = Number(process.env.PORT ?? 3000);
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.get("/health", (_req, res) => {
-  res.json({ ok: true });
+app.listen(PORT, () => {
+  console.log(`✅ rodando em http://localhost:${PORT}`);
 });
-
-app.listen(3001, () => console.log("rodando na 3001"));

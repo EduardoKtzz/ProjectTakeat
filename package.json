@@ -1,29 +1,24 @@
 {
   "name": "giftcards-mvp",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "MVP Gift Cards",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "@supabase/supabase-js": "^2.94.0",
-    "cors": "^2.8.6",
-    "dotenv": "^17.2.3",
-    "express": "^5.2.1",
-    "zod": "^4.3.6"
+    "@supabase/supabase-js": "^2.94.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.2.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.30",
+    "tsx": "^4.21.0",
+    "typescript": "^5.5.4"
   }
 }
