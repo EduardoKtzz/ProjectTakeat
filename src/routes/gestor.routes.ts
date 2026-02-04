@@ -9,3 +9,9 @@ gestorRoutes.get("/restaurantes/:id/cartoes", controller.listarCartoesPorRestaur
 
 // inserir um novo giftcard em um restaurante - gestor
 gestorRoutes.post("/restaurantes/:id/cartoes", controller.criarCartaoManual);
+
+// atualizar o status de um giftcard - gestor
+gestorRoutes.patch("/cartoes/:id/status", controller.alterarStatusCartao);
+
+// abater um valor do giftcard, parcial ou total - gestor
+gestorRoutes.post("/cartoes/:id/abater", controller.abaterCartao);

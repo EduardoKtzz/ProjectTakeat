@@ -49,5 +49,38 @@ export class CartoesRepo {
 
   return cartao;
 }
+
+  async atualizarStatus(cartaoId: string, status: "ativo" | "inativo") {
+    const { data, error } = await supabase
+      .from("cartoes_presente")
+      .update({ status })
+      .eq("id", cartaoId)
+      .select("*")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  }
+
+  async abaterPorFuncaoSQL(cartaoId: string, valor: number) {
+  const { data, error } = await supabase.rpc("abater_cartao_presente_por_id", {
+    p_cartao_id: cartaoId,
+    p_valor: valor
+  });
+
+  if (error) {
+    // a função lança exception e o Supabase devolve como erro
+    throw new Error(error.message);
+  }
+
+  // data costuma vir como array com 1 linha (porque returns table)
+  const linha = Array.isArray(data) ? data[0] : data;
+
+  return {
+    cartaoId: linha.cartao_id,
+    saldoAtual: linha.saldo_atual
+  };
+}
 }
 

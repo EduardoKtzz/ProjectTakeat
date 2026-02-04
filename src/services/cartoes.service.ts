@@ -30,4 +30,13 @@ export class CartoesService {
     const parte = () => Math.random().toString(36).slice(2, 6).toUpperCase();
     return `GC-${parte()}-${parte()}`;
   }
+
+  async alterarStatus(cartaoId: string, status: "ativo" | "inativo") {
+    return this.repo.atualizarStatus(cartaoId, status);
+}
+
+  async abater(cartaoId: string, valor: number) {
+    return this.repo.abaterPorFuncaoSQL(cartaoId, valor);
+  }
+
 }
