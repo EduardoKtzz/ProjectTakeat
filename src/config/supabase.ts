@@ -1,15 +1,12 @@
 // importações do projeto
-import { createClient } from '@supabase/supabase-js'
-import 'dotenv/config' // carrega o .env
+import "dotenv/config";
+import { createClient } from "@supabase/supabase-js";
 
-// puxando a chave do supabase do env
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
-// verifica se as chaves estão corretas
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Variáveis de ambiente do Supabase não encontradas!')
+  throw new Error("SUPABASE_URL ou SUPABASE_ANON_KEY não foram carregadas do .env");
 }
 
-//faz o export para uso externo
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
