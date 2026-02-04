@@ -11,4 +11,57 @@ export class GestorController {
 
     return res.json(cartoes);
   }
+
+  async criarCartaoManual(req: Request, res: Response) {
+  const restauranteId = req.params.id;
+
+  const { valor, telefonePresenteado, validadeEm, status } = req.body;
+
+  if (typeof valor !== "number" || valor <= 0) {
+    return res.status(400).json({ error: "Campo 'valor' inválido. Envie um número maior que 0." });
+  }
+
+  if (telefonePresenteado !== undefined && typeof telefonePresenteado !== "string") {
+    return res.status(400).json({ error: "Campo 'telefonePresenteado' deve ser string." });
+  }
+
+  // status obrigatório
+  if (status !== "ativo" && status !== "inativo") {
+    return res.status(400).json({ error: "Campo 'status' inválido. Use 'ativo' ou 'inativo'." });
+  }
+
+  // validadeEm obrigatório (YYYY-MM-DD)
+  if (typeof validadeEm !== "string") {
+    return res.status(400).json({ error: "Campo 'validadeEm' é obrigatório no formato YYYY-MM-DD." });
+  }
+
+  // validação simples de data (MVP)
+  const regexData = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regexData.test(validadeEm)) {
+    return res.status(400).json({ error: "Campo 'validadeEm' deve estar no formato YYYY-MM-DD." });
+  }
+
+  const dataValid = new Date(validadeEm + "T00:00:00");
+  if (Number.isNaN(dataValid.getTime())) {
+    return res.status(400).json({ error: "Campo 'validadeEm' não é uma data válida." });
+  }
+
+  // não permitir data no passado (recomendado)
+  const hoje = new Date();
+  const hojeZerado = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  if (dataValid < hojeZerado) {
+    return res.status(400).json({ error: "Campo 'validadeEm' não pode ser no passado." });
+  }
+
+  const cartao = await service.criarCartaoManual({
+    restauranteId,
+    valor,
+    telefonePresenteado,
+    validadeEm,
+    status
+  });
+
+  return res.status(201).json(cartao);
+}
+
 }
