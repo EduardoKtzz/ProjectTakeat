@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { CartoesService } from "../services/cartoes.service";
+import { RestaurantesService } from "../services/restaurantes.service";
 
 const service = new CartoesService();
+const restaurantesService = new RestaurantesService();
 
 export class GestorController {
   async listarCartoesPorRestaurante(req: Request, res: Response) {
@@ -96,6 +98,28 @@ export class GestorController {
     const transacoes = await service.listarTransacoes(cartaoId);
 
     return res.json(transacoes);
+}
+
+async atualizarWhatsappRestaurante(req: Request, res: Response) {
+  const restauranteId = req.params.id;
+  const { whatsappNumero } = req.body;
+
+  // validação mínima (MVP)
+  if (typeof whatsappNumero !== "string") {
+    return res.status(400).json({ error: "Campo 'whatsappNumero' deve ser string." });
+  }
+
+  // validação simples: só dígitos, tamanho entre 10 e 15
+  const apenasDigitos = whatsappNumero.replace(/\D/g, "");
+  if (apenasDigitos.length < 10 || apenasDigitos.length > 15) {
+    return res
+      .status(400)
+      .json({ error: "whatsappNumero inválido. Envie apenas números (DDI+DDD+numero). Ex: 5511999999999" });
+  }
+
+  const restauranteAtualizado = await restaurantesService.atualizarWhatsappRestaurante(restauranteId, apenasDigitos);
+
+  return res.json(restauranteAtualizado);
 }
 
 }

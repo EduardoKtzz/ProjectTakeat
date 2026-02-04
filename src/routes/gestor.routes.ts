@@ -19,3 +19,7 @@ gestorRoutes.post("/cartoes/:id/abater", controller.abaterCartao);
 // lista ordenada da mais recente para mais antiga 
 gestorRoutes.get("/cartoes/:id/transacoes", controller.listarTransacoes);
 
+// atualizar o número de whatsapp do restaurante
+gestorRoutes.patch("/restaurantes/:id/whatsapp", controller.atualizarWhatsappRestaurante);
+
+
