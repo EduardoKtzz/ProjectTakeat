@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comprar Gift Card</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./style/compra.css" />
+  </head>
+
+  <body>
+    <!-- NAVBAR (agora branca) -->
+    <header class="navbar">
+      <div class="navbar__content">
+        <a class="topbar__brand" href="./index.html">
+          <img
+            class="topbar__logo"
+            src="./assets/image-removebg-preview.png"
+            alt="Nome da empresa"
+          />
+        </a>
+
+        <nav aria-label="Navegação principal">
+          <ul class="topbar__menu">
+            <li><a class="topbar__link is-active" href="./compra.html">Comprar GiftCard</a></li>
+            <li><a class="topbar__link" href="./consulta.html">Consultar meu GiftCard</a></li>
+          </ul>
+        </nav>
+
+        <a class="btn btn--topbar" href="./gestor.html">Você é dono? Clique aqui!</a>
+      </div>
+    </header>
+
+    <!-- CARD DO TÍTULO -->
+    <section class="heroCard">
+      <div class="heroCard__content">
+        <h1 class="heroCard__title">Compre um Gift Card Digital</h1>
+        <p class="heroCard__subtitle">Presenteie alguém com um cartão de presente!</p>
+      </div>
+    </section>
+
+    <main class="container">
+      <section class="card">
+        <div class="card__header">
+          <h2 class="card__title">Dados da compra</h2>
+          <p class="card__help">
+            Preencha e confirme. Após o pagamento, um gift card será gerado na sua conta.
+          </p>
+        </div>
+
+        <form id="form-compra" class="form" novalidate>
+          <!-- Valor -->
+          <div class="field">
+            <label class="label">Valor do gift card</label>
+
+            <div class="value-cards" role="group" aria-label="Selecionar valor">
+              <button type="button" class="value-card" data-value="25">
+                <div class="value-card__top">
+                  <span class="value-card__badge">Inicial</span>
+                  <span class="value-card__icon" aria-hidden="true">🎁</span>
+                </div>
+                <div class="value-card__price">R$ 25</div>
+              </button>
+
+              <button type="button" class="value-card" data-value="50">
+                <div class="value-card__top">
+                  <span class="value-card__badge">Mais escolhido</span>
+                  <span class="value-card__icon" aria-hidden="true">🔥</span>
+                </div>
+                <div class="value-card__price">R$ 50</div>
+              </button>
+
+              <button type="button" class="value-card" data-value="100">
+                <div class="value-card__top">
+                  <span class="value-card__badge">Avançado</span>
+                  <span class="value-card__icon" aria-hidden="true">✨</span>
+                </div>
+                <div class="value-card__price">R$ 100</div>
+              </button>
+
+              <button type="button" class="value-card" data-value="150">
+                <div class="value-card__top">
+                  <span class="value-card__badge">Completo</span>
+                  <span class="value-card__icon" aria-hidden="true">🏆</span>
+                </div>
+                <div class="value-card__price">R$ 150</div>
+              </button>
+            </div>
+
+            <div class="inline">
+              <label class="label label--small" for="valorCustom">Ou digite um valor</label>
+              <input
+                id="valorCustom"
+                name="valorCustom"
+                class="input"
+                inputmode="decimal"
+                placeholder="Ex: 75"
+              />
+            </div>
+
+            <p class="hint">O valor final será usado para gerar o cartão.</p>
+
+          <hr class="divider" />
+
+          <!-- Quem compra -->
+          <div class="field">
+            <label class="label" for="compradorNome">Quem está comprando</label>
+            <input
+              id="compradorNome"
+              name="compradorNome"
+              class="input"
+              placeholder="Ex: Eduardo"
+            />
+          </div>
+
+                    <!-- Quem compra -->
+          <div class="field">
+            <label class="label" for="recebedorNome">Quem está recebendo</label>
+            <input
+              id="recebedorNome"
+              name="recebedorNome"
+              class="input"
+              placeholder="Ex: João"
+            />
+          </div>
+
+          <!-- Quem recebe -->
+          <div class="field">
+            <label class="label" for="telefonePresenteado">Telefone do presenteado</label>
+            <input
+              id="telefonePresenteado"
+              name="telefonePresenteado"
+              class="input"
+              inputmode="tel"
+              placeholder="Ex: 5511999999999"
+              required
+            />
+            <p class="hint">Esse telefone receberá o gift card no WhatsApp.</p>
+          </div>
+
+          <!-- Ações -->
+          <div class="actions">
+            <button id="btnCriarCompra" class="btn btn--primary" type="submit">
+              Comprar
+            </button>
+
+            <button id="btnConfirmarPagamento" class="btn btn--ghost" type="button" disabled>
+              Confirmar pagamento
+            </button>
+          </div>
+
+          <div id="alert" class="alert" hidden></div>
+        </form>
+      </section>
+
+      <section class="card" id="resultado" hidden>
+        <div class="card__header">
+          <h2 class="card__title">Resultado</h2>
+          <p class="card__help">Aqui você vê os dados gerados no MVP.</p>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-label">Compra ID</div>
+            <div class="result-value" id="resCompraId">-</div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-label">Status</div>
+            <div class="result-value" id="resStatus">-</div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-label">Gift Card (código)</div>
+            <div class="result-value result-value--mono" id="resCodigo">-</div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-label">Saldo</div>
+            <div class="result-value" id="resSaldo">-</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btnNovaCompra" class="btn btn--secondary" type="button">
+            Fazer outra compra
+          </button>
+        </div>
+      </section>
+    </main>
+
+     <!-- ONDA FULL-WIDTH (fora do container) -->
+    <section class="brandWave" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path
+          d="M0,80 C240,20 480,140 720,80 960,20 1200,140 1440,80 L1440,120 L0,120 Z"
+          fill="var(--red)"
+        ></path>
+      </svg>
+    </section>
+
+    <script src="./js/compra.js"></script>
+  </body>
+</html>
