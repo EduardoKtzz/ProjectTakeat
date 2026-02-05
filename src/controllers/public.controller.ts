@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { authClienteService } from "../services/authCliente.service";
+import { compraPublicaService } from "../services/compras.service";
 import { supabase } from "../config/supabase";
 
 export const clienteController = {
@@ -43,6 +44,27 @@ export const clienteController = {
          return res.json({ telefone, cartoes: data || [] });
       } catch {
          return res.status(500).json({ message: "Erro inesperado." });
+      }
+   },
+};
+
+export const compraPublicaController = {
+   async criarCompra(req: Request, res: Response) {
+      try {
+         const compra = await compraPublicaService.criarCompra(req.body);
+         return res.status(201).json(compra);
+      } catch (e: any) {
+         return res.status(400).json({ message: e.message });
+      }
+   },
+
+   async confirmarPagamento(req: Request, res: Response) {
+      try {
+         const { id } = req.params;
+         const resultado = await compraPublicaService.confirmarPagamento(id);
+         return res.json(resultado);
+      } catch (e: any) {
+         return res.status(400).json({ message: e.message });
       }
    },
 };

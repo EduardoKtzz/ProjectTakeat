@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { gestorRoutes } from "./routes/gestor.routes";
 import clienteRoutes from "./routes/public.routes";
+import publicCompraRoutes from "./routes/public.routes";
 
 export const app = express();
 
@@ -15,3 +16,5 @@ app.get("/health", (_req, res) => {
 app.use("/api/gestor", gestorRoutes);
 
 app.use("/api/cliente", clienteRoutes);
+
+app.use("/api/public", publicCompraRoutes);
