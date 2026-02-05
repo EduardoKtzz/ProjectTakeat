@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consultar Gift Cards</title>
+
+    <link rel="stylesheet" href="./style/consulta.css" />
+  </head>
+
+  <body>
+    <!-- Barra superior -->
+    <header class="barra-topo">
+      <div class="container barra-topo__conteudo">
+        <div class="marca">
+          <span class="marca__ponto"></span>
+          <span class="marca__nome">Gift Cards</span>
+        </div>
+
+        <nav class="barra-topo__menu">
+          <a href="compra.html" class="link">Comprar</a>
+          <a href="./consulta.html" class="link link--ativo">Consultar</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Conteúdo -->
+    <main class="container">
+      <section class="hero">
+        <div class="hero__esquerda">
+          <p class="selo">Consulta segura</p>
+          <h1 class="titulo">Consulte seus gift cards em segundos</h1>
+          <p class="subtitulo">
+            Receba um código no WhatsApp e visualize saldo, status e validade dos seus gift cards.
+          </p>
+
+          <div class="confianca">
+            <div class="confianca__item">
+              <span class="confianca__icone">✓</span>
+              <span>Sem senha</span>
+            </div>
+            <div class="confianca__item">
+              <span class="confianca__icone">✓</span>
+              <span>Simples e direto</span>
+            </div>
+            <div class="confianca__item">
+              <span class="confianca__icone">✓</span>
+              <span>Código único (OTP)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__direita">
+          <div class="cartao">
+            <div class="cartao__cabecalho">
+              <h2 class="cartao__titulo">Acessar</h2>
+              <p class="cartao__descricao">Informe seu WhatsApp para receber o código.</p>
+            </div>
+
+            <!-- Etapa 1: telefone -->
+            <form id="form-telefone" class="formulario">
+              <label class="rotulo" for="telefone">WhatsApp</label>
+
+              <div class="linha-input">
+                <input
+                  id="telefone"
+                  name="telefone"
+                  class="input"
+                  placeholder="(11) 99999-9999"
+                  autocomplete="tel"
+                  inputmode="tel"
+                  required
+                />
+              </div>
+
+              <button id="botao-enviar" class="botao botao--primario" type="submit">
+                Enviar código
+              </button>
+
+              <p class="dica">
+                Ao continuar, você receberá um código por WhatsApp.
+              </p>
+            </form>
+
+            <!-- Etapa 2: código -->
+            <form id="form-codigo" class="formulario escondido">
+              <label class="rotulo" for="codigo">Código recebido</label>
+
+              <div class="linha-input">
+                <input
+                  id="codigo"
+                  name="codigo"
+                  class="input"
+                  placeholder="000000"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength="6"
+                  required
+                />
+              </div>
+
+              <button id="botao-validar" class="botao botao--primario" type="submit">
+                Entrar e consultar
+              </button>
+
+              <div class="linha-entre">
+                <button id="botao-voltar" class="botao botao--fantasma" type="button">
+                  Trocar número
+                </button>
+
+                <button id="botao-reenviar" class="botao botao--link" type="button">
+                  Reenviar código
+                </button>
+              </div>
+
+              <p id="otp-dev" class="dica escondido"></p>
+              <p class="dica" id="dica-temporizador"></p>
+            </form>
+
+            <!-- Área logada -->
+            <div id="area-logada" class="escondido">
+              <div class="linha-entre">
+                <div>
+                  <h3 class="mini-titulo">Seus gift cards</h3>
+                  <p class="mini-subtitulo" id="telefone-usuario"></p>
+                </div>
+                <button id="botao-sair" class="botao botao--fantasma" type="button">
+                  Sair
+                </button>
+              </div>
+
+              <div id="estado" class="estado escondido"></div>
+              <div id="lista" class="lista"></div>
+            </div>
+
+            <div id="toast" class="toast escondido"></div>
+          </div>
+
+          <div class="nota-lateral">
+            <p class="nota-lateral__titulo">Dica</p>
+            <p class="nota-lateral__texto">
+              Se você tiver mais de um gift card, todos aparecerão aqui com saldo, status e validade.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <div class="container rodape__conteudo">
+        <p>© <span id="ano"></span> Gift Cards</p>
+        <p class="rodape__texto">Cores: branco, vermelho e preto.</p>
+      </div>
+    </footer>
+
+    <script src="./js/consulta.js"></script>
+  </body>
+</html>

@@ -172,7 +172,7 @@ nav {
 ========================= */
 .container {
   width: min(980px, calc(100% - 32px));
-  margin: 16px auto 48px;
+  margin: 16px auto -30px;
 }
 
 .card {
