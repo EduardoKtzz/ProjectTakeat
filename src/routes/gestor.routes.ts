@@ -1,9 +1,20 @@
 import { Router } from "express";
 import { authGestor } from "../shared/middlewares/authGestor";
+import { authGestorService } from "../services/authGestor.service";
 import { GestorController } from "../controllers/gestor.controller";
 
 export const gestorRoutes = Router();
 const controller = new GestorController();
+
+gestorRoutes.post("/auth/login", async (req, res) => {
+  try {
+    const { email, senha } = req.body;
+    const result = await authGestorService.login(email, senha);
+    return res.json(result);
+  } catch (e: any) {
+    return res.status(400).json({ message: e.message || "Erro" });
+  }
+});
 
 gestorRoutes.use(authGestor);
 

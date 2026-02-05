@@ -34,3 +34,7 @@ app.get("/", (_req, res) => {
 app.get("/cliente/compra", (_req, res) => {
   res.sendFile(path.join(publicDir, "cliente", "compra.html"));
 });
+
+app.get("/gestor", (_req, res) => {
+  res.sendFile(path.join(publicDir, "gestor", "index.html"));
+});
