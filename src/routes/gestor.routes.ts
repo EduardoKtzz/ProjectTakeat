@@ -1,8 +1,11 @@
 import { Router } from "express";
+import { authGestor } from "../shared/middlewares/authGestor";
 import { GestorController } from "../controllers/gestor.controller";
 
 export const gestorRoutes = Router();
 const controller = new GestorController();
+
+gestorRoutes.use(authGestor);
 
 // listar giftcards de um restaurante - gestor
 gestorRoutes.get("/restaurantes/:id/cartoes", controller.listarCartoesPorRestaurante);
