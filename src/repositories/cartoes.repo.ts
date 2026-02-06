@@ -13,42 +13,38 @@ export class CartoesRepo {
       return data ?? [];
    }
 
-   async criarCartaoComEmissao(input: {
-      restauranteId: string;
-      codigo: string;
-      valor: number;
-      telefonePresenteado: string | null;
-      validadeEm: string; // obrigatório
-      status: "ativo" | "inativo"; // obrigatório
-   }) {
-      const { data: cartao, error: e1 } = await supabase
-         .from("cartoes_presente")
-         .insert({
-            restaurante_id: input.restauranteId,
-            codigo: input.codigo,
-            valor_inicial: input.valor,
-            saldo: input.valor,
-            status: input.status,
-            validade_em: input.validadeEm,
-            telefone_presenteado: input.telefonePresenteado,
-         })
-         .select("*")
-         .single();
+async criarCartaoComEmissao(input: {
+  restauranteId: string;
+  codigo: string;
+  valor: number;
+  telefonePresenteado?: string | null;
+  validadeEm: string; // YYYY-MM-DD se você fez Opção A (DATE)
+  status: "ativo" | "inativo";
+}) {
+  const { data, error } = await supabase
+    .from("cartoes_presente")
+    .insert([
+      {
+        restaurante_id: input.restauranteId,
+        codigo: input.codigo,
 
-      if (e1) throw new Error(e1.message);
+        // ✅ CORREÇÃO DO ERRO: coluna NOT NULL
+        valor_inicial: input.valor,
 
-      const { error: e2 } = await supabase
-         .from("transacoes_cartao_presente")
-         .insert({
-            cartao_presente_id: cartao.id,
-            tipo: "emissao",
-            valor: input.valor,
-         });
+        // ✅ normalmente o saldo começa igual ao valor inicial
+        saldo: input.valor,
 
-      if (e2) throw new Error(e2.message);
+        telefone_presenteado: input.telefonePresenteado ?? null,
+        validade_em: input.validadeEm, // DATE (YYYY-MM-DD) ou timestamp
+        status: input.status,
+      },
+    ])
+    .select("*")
+    .single();
 
-      return cartao;
-   }
+  if (error) throw new Error(error.message);
+  return data;
+}
 
    async atualizarStatus(cartaoId: string, status: "ativo" | "inativo") {
       const { data, error } = await supabase

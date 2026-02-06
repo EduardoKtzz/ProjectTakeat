@@ -143,10 +143,18 @@ function formatBRL(value) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function formatarDataHoraBR(isoDate) {
-  if (!isoDate) return "—";
+function formatarDataHoraBR(valor) {
+  if (!valor) return "—";
 
-  const d = new Date(isoDate);
+  const s = String(valor).trim();
+
+  // ✅ Se vier como DATE do Supabase ("YYYY-MM-DD"), NÃO usa Date()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    return formatarDataBR(s);
+  }
+
+  // ✅ Se vier ISO com hora (created_at etc), aí sim usa Date()
+  const d = new Date(s);
   if (Number.isNaN(d.getTime())) return "—";
 
   return d.toLocaleString("pt-BR", {
@@ -156,6 +164,17 @@ function formatarDataHoraBR(isoDate) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function formatarDataBR(dataYMD) {
+  if (!dataYMD) return "—";
+
+  // aceita "YYYY-MM-DD"
+  const s = String(dataYMD).trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return "—";
+
+  const [ano, mes, dia] = s.split("-");
+  return `${dia}/${mes}/${ano}`;
 }
 
 /**
@@ -418,8 +437,8 @@ async function carregarExtrato(cartaoId) {
         const classe = valor >= 0 ? "positivo" : "negativo";
         const valorFmt = formatBRL(Math.abs(valor));
 
-        const titulo = t.tipo || t.descricao || (valor >= 0 ? "Crédito" : "Débito");
-        const detalhe = t.referencia || t.pedido_id || t.pedidoId || "";
+      const titulo =t.tipo ||t.descricao ||(ehEmissao ? "Emissão" : ehAbatimento ? "Abatimento" : valor >= 0 ? "Crédito" : "Débito");        
+      const detalhe = t.referencia || t.pedido_id || t.pedidoId || "";
 
         return `
           <div class="extrato__row">
@@ -534,6 +553,8 @@ el.listaCartoes.addEventListener("click", async (ev) => {
   if (acao === "extrato") {
     abrirModalExtrato(cartao);
     await carregarExtrato(cartao.id);
+    console.log("TRANSACOES:", lista);
+
   }
 
   if (acao === "status") {

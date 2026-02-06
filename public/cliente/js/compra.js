@@ -1,10 +1,23 @@
-/**
- * Ajuste estas duas constantes para o seu ambiente.
- * - API_BASE: se o frontend está sendo servido pelo mesmo servidor, pode ser "".
- * - RESTAURANTE_ID: no MVP, pode ser fixo.
- */
-const API_BASE = "http://localhost:3001"; // ex: "http://localhost:3001"
-const RESTAURANTE_ID = "0bab7d6b-ff79-4828-a28f-c9c57143d120"; // troque se necessário
+// ======================================================
+// TELA DE COMPRA - MVP GIFT CARDS
+// - Cria compra (pendente)
+// - Mostra tela de pagamento (simulado)
+// - Confirma pagamento (simulado) e exibe sucesso
+//
+// MELHORIAS APLICADAS NESTA VERSÃO:
+// ✅ Máscara de telefone no campo telefonePresenteado
+// ✅ Normalização e envio do telefone no padrão WhatsApp (E.164): +55DDDNÚMERO
+// ✅ Correção de bug: "campoTelefone" não existia no seu código
+// ✅ Validação coerente (usuário digita (DD) 9XXXX-XXXX e sistema envia +55...)
+// ✅ Evita erro de duplicar 55 (se usuário colar 5511... nós tratamos)
+// ======================================================
+
+
+// =========================
+// VARIAVEIS DA API
+// =========================
+const API_BASE = "http://localhost:3001";
+const RESTAURANTE_ID = "0bab7d6b-ff79-4828-a28f-c9c57143d120"; // AQUI VAI DEPENDER DO RESTAURANTE
 
 // =========================
 // Estado
@@ -85,13 +98,83 @@ function definirCarregando(estaCarregando) {
   botaoCriarCompra.textContent = estaCarregando ? "Processando..." : "Comprar";
 }
 
+// ======================================================
+// TELEFONE: MÁSCARA + NORMALIZAÇÃO (WhatsApp / E.164)
+// ======================================================
+
+/**
+ * Aplica máscara brasileira:
+ * - Fixo:    (11) 3232-3232
+ * - Celular: (11) 91234-5678
+ *
+ * Obs: Aqui a pessoa digita apenas DDD + número.
+ * O +55 não entra no input (ideal).
+ */
+function aplicarMascaraTelefone(valor) {
+  valor = String(valor || "").replace(/\D/g, ""); // remove tudo que não é número
+
+  // se usuário colar "55..." no começo, removemos para manter só DDD+numero no input
+  // Isso evita que a pessoa digite "551199..." e fique estranho com a máscara.
+  if (valor.startsWith("55") && valor.length >= 12) {
+    valor = valor.slice(2);
+  }
+
+  // limita em 11 dígitos (DDD + celular)
+  if (valor.length > 11) {
+    valor = valor.slice(0, 11);
+  }
+
+  // Telefone fixo: (11) 3232-3232 (10 dígitos)
+  if (valor.length <= 10) {
+    return valor.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
+  }
+
+  // Celular: (11) 91234-5678 (11 dígitos)
+  return valor.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
+}
+
+/**
+ * Converte o valor do input mascarado para o padrão WhatsApp (E.164):
+ * - Entrada: "(11) 91234-5678"
+ * - Saída:   "+5511912345678"
+ *
+ * Aceita 10 ou 11 dígitos após limpeza:
+ * - 10 dígitos: DDD + fixo
+ * - 11 dígitos: DDD + celular
+ */
+function formatarTelefoneParaWhatsApp(valorMascara) {
+  const numeros = String(valorMascara || "").replace(/\D/g, "");
+
+  // aceita somente 10 ou 11 dígitos (DDD + número)
+  if (!(numeros.length === 10 || numeros.length === 11)) {
+    return null;
+  }
+
+  return `+55${numeros}`;
+}
+
+/**
+ * Usado para validar e padronizar telefone antes de enviar.
+ * Retorna:
+ *  - { ok: true, telefoneE164: "+55..." }
+ *  - { ok: false, erro: "..." }
+ */
+function validarEFormatarTelefone(telefoneDigitado) {
+  const telefoneE164 = formatarTelefoneParaWhatsApp(telefoneDigitado);
+
+  if (!telefoneE164) {
+    return {
+      ok: false,
+      erro: "Telefone inválido. Digite no formato (DD) 9XXXX-XXXX ou (DD) XXXX-XXXX."
+    };
+  }
+
+  return { ok: true, telefoneE164 };
+}
+
 // =========================
 // Normalizações / validação
 // =========================
-function normalizarTelefone(valor) {
-  return String(valor || "").replace(/\D/g, "");
-}
-
 function obterValorFinal() {
   const textoDigitado = String(valorPersonalizado?.value || "").replace(",", ".").trim();
   const valorDigitado = textoDigitado ? Number(textoDigitado) : null;
@@ -115,21 +198,25 @@ function validarCampos() {
 
   const comprador = (nomeComprador?.value || "").trim();
   const presenteado = (nomePresenteado?.value || "").trim();
-  const telefone = normalizarTelefone(telefonePresenteado?.value);
+
+  // Aqui, o usuário digita com máscara. Nós validamos e convertemos para +55...
+  const telCheck = validarEFormatarTelefone(telefonePresenteado?.value || "");
 
   if (!presenteado) {
     return { ok: false, erro: "Informe o nome de quem está recebendo.", campo: nomePresenteado };
   }
 
-  if (!telefone || telefone.length < 10) {
-    return {
-      ok: false,
-      erro: "Telefone do presenteado inválido. Envie DDI+DDD+número. Ex: 5511999999999",
-      campo: telefonePresenteado
-    };
+  if (!telCheck.ok) {
+    return { ok: false, erro: telCheck.erro, campo: telefonePresenteado };
   }
 
-  return { ok: true, valor: valor.valor, comprador, presenteado, telefone };
+  return {
+    ok: true,
+    valor: valor.valor,
+    comprador,
+    presenteado,
+    telefone: telCheck.telefoneE164 // ✅ já vai no formato +55...
+  };
 }
 
 // =========================
@@ -208,7 +295,15 @@ function mostrarTelaPagamentoComDados({ valor, presenteado, telefone }) {
   // preenche info
   if (pagamentoValor) pagamentoValor.textContent = formatarBRL(valor);
   if (pagamentoPresenteado) pagamentoPresenteado.textContent = presenteado || "-";
-  if (pagamentoTelefone) pagamentoTelefone.textContent = telefone || "-";
+
+  // Se quiser mostrar o telefone com máscara na tela de pagamento, dá para mascarar de volta:
+  // (mas como agora ele vem em +55..., fazemos um ajuste simples)
+  if (pagamentoTelefone) {
+    const telSoNumeros = String(telefone || "").replace(/\D/g, "");
+    // telSoNumeros esperado: 55 + DDD + número -> remove 55 para exibir como BR
+    const sem55 = telSoNumeros.startsWith("55") ? telSoNumeros.slice(2) : telSoNumeros;
+    pagamentoTelefone.textContent = aplicarMascaraTelefone(sem55);
+  }
 
   // habilita confirmar
   if (botaoConfirmarPagamento) botaoConfirmarPagamento.disabled = false;
@@ -266,8 +361,8 @@ async function criarCompra() {
       restauranteId: RESTAURANTE_ID,
       valor: valid.valor,
       compradorNome: valid.comprador || undefined,
-      nomePresenteado: valid.presenteado, // ✅ agora bate com o service
-      telefonePresenteado: valid.telefone
+      nomePresenteado: valid.presenteado, // ✅ bate com o service
+      telefonePresenteado: valid.telefone  // ✅ agora vai como +55...
     };
 
     const resposta = await fetch(`${API_BASE}/api/public/compras`, {
@@ -382,6 +477,7 @@ function resetarTudo() {
   if (valorPersonalizado) valorPersonalizado.value = "";
   if (nomeComprador) nomeComprador.value = "";
   if (nomePresenteado) nomePresenteado.value = "";
+
   if (telefonePresenteado) telefonePresenteado.value = "";
 
   atualizarResumo(0);
@@ -410,3 +506,12 @@ if (botaoNovaCompra) {
 
 // Inicial: confirmar pagamento desabilitado
 if (botaoConfirmarPagamento) botaoConfirmarPagamento.disabled = true;
+
+// ======================================================
+// EVENTO: máscara aplicada no input REAL (telefonePresenteado)
+// ======================================================
+if (telefonePresenteado) {
+  telefonePresenteado.addEventListener("input", (evento) => {
+    evento.target.value = aplicarMascaraTelefone(evento.target.value);
+  });
+}

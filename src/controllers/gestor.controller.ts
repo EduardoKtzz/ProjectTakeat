@@ -1,162 +1,141 @@
-// importações do projeto
 import { Request, Response } from "express";
 import { CartoesService } from "../services/cartoes.service";
 import { RestaurantesService } from "../services/restaurantes.service";
 
-// instanciando as funções
-const service = new CartoesService();
+const cartoesService = new CartoesService();
 const restaurantesService = new RestaurantesService();
 
-// classe geral do gestor, com export para ser usa em outros lugares
 export class GestorController {
-   // função para listar todos os gifts cards de um restaurante
-   async listarCartoesPorRestaurante(req: Request, res: Response) {
-      // reebendo o ID do restaurante atual
-      const restauranteId = req.params.id;
-      const cartoes = await service.listarPorRestaurante(restauranteId);
+  async listarCartoesPorRestaurante(req: Request, res: Response) {
+    const restauranteId = req.params.id;
+    const cartoes = await cartoesService.listarPorRestaurante(restauranteId);
+    return res.json(cartoes);
+  }
 
-      return res.json(cartoes);
-   }
+  async criarCartaoManual(req: Request, res: Response) {
+    const restauranteId = req.params.id;
+    const { valor, telefonePresenteado, validadeEm, status } = req.body;
 
-   // função para criar um novo gift card do zero
-   async criarCartaoManual(req: Request, res: Response) {
-      // reebendo o ID do restaurante atual
-      const restauranteId = req.params.id;
+    if (typeof valor !== "number" || valor <= 0) {
+      return res.status(400).json({
+        error: "Campo 'valor' inválido. Envie um número maior que 0.",
+      });
+    }
 
-      // recebendo os valores do frontend
-      const { valor, telefonePresenteado, validadeEm, status } = req.body;
+    if (telefonePresenteado !== undefined && typeof telefonePresenteado !== "string") {
+      return res.status(400).json({
+        error: "Campo 'telefonePresenteado' deve ser string.",
+      });
+    }
 
-      // validações para os campos obrigatorios
-      if (typeof valor !== "number" || valor <= 0) {
-         return res.status(400).json({
-            error: "Campo 'valor' inválido. Envie um número maior que 0.",
-         });
-      }
+    if (status !== "ativo" && status !== "inativo") {
+      return res.status(400).json({
+        error: "Campo 'status' inválido. Use 'ativo' ou 'inativo'.",
+      });
+    }
 
-      if (
-         telefonePresenteado !== undefined &&
-         typeof telefonePresenteado !== "string"
-      ) {
-         return res
-            .status(400)
-            .json({ error: "Campo 'telefonePresenteado' deve ser string." });
-      }
+    // ✅ usa validadeFinal SEMPRE
+    let validadeFinal = String(validadeEm ?? "").trim();
 
-      // status obrigatório
-      if (status !== "ativo" && status !== "inativo") {
-         return res.status(400).json({
-            error: "Campo 'status' inválido. Use 'ativo' ou 'inativo'.",
-         });
-      }
-
-      let validadeFinal = validadeEm;
-
-      if (validadeFinal === undefined || validadeFinal === null || validadeFinal === "") {
+    // se não veio, define padrão 60 dias à frente
+    if (!validadeFinal) {
       const d = new Date();
       d.setDate(d.getDate() + 60);
-      validadeFinal = d.toISOString().slice(0, 10);
-      }
+      validadeFinal = d.toISOString().slice(0, 10); // YYYY-MM-DD
+    }
 
-      // validação simples de data (MVP) — agora valida o validadeFinal
-      const regexData = /^\d{4}-\d{2}-\d{2}$/;
-      if (!regexData.test(validadeFinal)) {
+    // valida formato YYYY-MM-DD
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(validadeFinal)) {
       return res.status(400).json({
-         error: "Campo 'validadeEm' deve estar no formato YYYY-MM-DD.",
+        error: "Campo 'validadeEm' deve estar no formato YYYY-MM-DD.",
       });
-   }
+    }
 
-      const dataValid = new Date(validadeFinal + "T00:00:00");
-      if (Number.isNaN(dataValid.getTime())) {
-      return res.status(400).json({ error: "Campo 'validadeEm' não é uma data válida." });
-      }
-
-
-      // não permitir data no passado
-      const hoje = new Date();
-      const hojeZerado = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-      if (dataValid < hojeZerado) {
-      return res.status(400).json({ error: "Campo 'validadeEm' não pode ser no passado." });
-      }
-
-      const cartao = await service.criarCartaoManual({
-         restauranteId,
-         valor,
-         telefonePresenteado,
-         validadeEm,
-         status,
+    // valida se é data real e não no passado (local)
+    const [y, m, d] = validadeFinal.split("-").map(Number);
+    const dataVal = new Date(y, m - 1, d, 0, 0, 0, 0);
+    if (Number.isNaN(dataVal.getTime())) {
+      return res.status(400).json({
+        error: "Campo 'validadeEm' não é uma data válida.",
       });
+    }
 
-      return res.status(201).json(cartao);
-   }
+    const hoje = new Date();
+    const hojeZerado = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    if (dataVal < hojeZerado) {
+      return res.status(400).json({
+        error: "Campo 'validadeEm' não pode ser no passado.",
+      });
+    }
 
-   async alterarStatusCartao(req: Request, res: Response) {
-      const cartaoId = req.params.id;
-      const { status } = req.body;
+    const cartao = await cartoesService.criarCartaoManual({
+      restauranteId,
+      valor,
+      telefonePresenteado,
+      validadeEm: validadeFinal, // ✅ YYYY-MM-DD
+      status,
+    });
 
-      if (status !== "ativo" && status !== "inativo") {
-         return res.status(400).json({
-            error: "Campo 'status' inválido. Use 'ativo' ou 'inativo'.",
-         });
-      }
+    return res.status(201).json(cartao);
+  }
 
-      const cartaoAtualizado = await service.alterarStatus(cartaoId, status);
+  async alterarStatusCartao(req: Request, res: Response) {
+    const cartaoId = req.params.id;
+    const { status } = req.body;
 
-      return res.json(cartaoAtualizado);
-   }
+    if (status !== "ativo" && status !== "inativo") {
+      return res.status(400).json({
+        error: "Campo 'status' inválido. Use 'ativo' ou 'inativo'.",
+      });
+    }
 
-   async abaterCartao(req: Request, res: Response) {
-      const cartaoId = req.params.id;
-      const { valor } = req.body;
+    const cartaoAtualizado = await cartoesService.alterarStatus(cartaoId, status);
+    return res.json(cartaoAtualizado);
+  }
 
-      if (typeof valor !== "number" || valor <= 0) {
-         return res.status(400).json({
-            error: "Campo 'valor' inválido. Envie um número maior que 0.",
-         });
-      }
+  async abaterCartao(req: Request, res: Response) {
+    const cartaoId = req.params.id;
+    const { valor } = req.body;
 
-      const resultado = await service.abater(cartaoId, valor);
+    if (typeof valor !== "number" || valor <= 0) {
+      return res.status(400).json({
+        error: "Campo 'valor' inválido. Envie um número maior que 0.",
+      });
+    }
 
-      return res.json(resultado);
-   }
+    const resultado = await cartoesService.abater(cartaoId, valor);
+    return res.json(resultado);
+  }
 
-   async listarTransacoes(req: Request, res: Response) {
-      const cartaoId = req.params.id;
+  async listarTransacoes(req: Request, res: Response) {
+    const cartaoId = req.params.id;
+    const transacoes = await cartoesService.listarTransacoes(cartaoId);
+    return res.json(transacoes);
+  }
 
-      const transacoes = await service.listarTransacoes(cartaoId);
+  async atualizarWhatsappRestaurante(req: Request, res: Response) {
+    const restauranteId = req.params.id;
+    const { whatsappNumero } = req.body;
 
-      return res.json(transacoes);
-   }
+    if (typeof whatsappNumero !== "string") {
+      return res.status(400).json({ error: "Campo 'whatsappNumero' deve ser string." });
+    }
 
-   async atualizarWhatsappRestaurante(req: Request, res: Response) {
-      const restauranteId = req.params.id;
-      const { whatsappNumero } = req.body;
+    const apenasDigitos = whatsappNumero.replace(/\D/g, "");
+    if (apenasDigitos.length < 10 || apenasDigitos.length > 15) {
+      return res.status(400).json({
+        error: "whatsappNumero inválido. Envie apenas números (DDI+DDD+numero). Ex: 5511999999999",
+      });
+    }
 
-      // validação mínima (MVP)
-      if (typeof whatsappNumero !== "string") {
-         return res
-            .status(400)
-            .json({ error: "Campo 'whatsappNumero' deve ser string." });
-      }
+    const restauranteAtualizado =
+      await restaurantesService.atualizarWhatsappRestaurante(restauranteId, apenasDigitos);
 
-      // validação simples: só dígitos, tamanho entre 10 e 15
-      const apenasDigitos = whatsappNumero.replace(/\D/g, "");
-      if (apenasDigitos.length < 10 || apenasDigitos.length > 15) {
-         return res.status(400).json({
-            error: "whatsappNumero inválido. Envie apenas números (DDI+DDD+numero). Ex: 5511999999999",
-         });
-      }
+    return res.json(restauranteAtualizado);
+  }
 
-      const restauranteAtualizado =
-         await restaurantesService.atualizarWhatsappRestaurante(
-            restauranteId,
-            apenasDigitos,
-         );
-
-      return res.json(restauranteAtualizado);
-   }
-
-   async listarRestaurantes(req: Request, res: Response) {
-      const restaurantes = await restaurantesService.listarTodos();
-      return res.json(restaurantes);
-   }
+  async listarRestaurantes(req: Request, res: Response) {
+    const restaurantes = await restaurantesService.listarTodos();
+    return res.json(restaurantes);
+  }
 }

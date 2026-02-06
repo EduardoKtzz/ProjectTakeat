@@ -1,3 +1,4 @@
+
 const API = {
   URL_BASE: "http://localhost:3001",
   PREFIXO: "/api/gestor",
@@ -43,6 +44,9 @@ const el = {
 let cacheRestaurantes = [];
 let restauranteAtualId = null;
 
+/* =========================================================
+   SESSÃO / AUTH
+========================================================= */
 function limparSessao() {
   localStorage.removeItem(CHAVES.token);
   localStorage.removeItem(CHAVES.expiraEm);
@@ -70,10 +74,19 @@ function irParaLogin() {
   window.location.href = URL_LOGIN;
 }
 
+/* =========================================================
+   ALERT / LOADING
+========================================================= */
 function setAlert(msg) {
   el.alert.classList.remove("alert--sucesso");
   el.alert.classList.add("alert--erro");
+  el.alert.textContent = msg;
+  el.alert.hidden = false;
+}
 
+function setAlertSucesso(msg) {
+  el.alert.classList.remove("alert--erro");
+  el.alert.classList.add("alert--sucesso");
   el.alert.textContent = msg;
   el.alert.hidden = false;
 }
@@ -93,6 +106,9 @@ function setLoading(v) {
   el.selectRestaurante.disabled = v;
 }
 
+/* =========================================================
+   TELAS
+========================================================= */
 function mostrarSelecao() {
   el.cardSelect.hidden = false;
   el.cardForm.hidden = true;
@@ -111,57 +127,79 @@ function getNomeRestaurante(id) {
   return r?.nome || id;
 }
 
-function normalizarTelefone(v) {
-  const dig = String(v || "").replace(/\D/g, "");
-  return dig || "";
+/* =========================================================
+   TELEFONE: MÁSCARA + FORMATO WHATSAPP (E.164)
+   Usuário digita: (11) 91234-5678
+   API recebe:     5511912345678
+========================================================= */
+function aplicarMascaraTelefone(valor) {
+  let v = String(valor || "").replace(/\D/g, "");
+
+  // se colar 55+DDD+numero, remove 55 do input
+  if (v.startsWith("55") && v.length >= 12) v = v.slice(2);
+
+  // limita em 11 dígitos (DDD + celular)
+  if (v.length > 11) v = v.slice(0, 11);
+
+  // fixo: (DD) 9999-9999
+  if (v.length <= 10) {
+    return v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
+  }
+
+  // celular: (DD) 99999-9999
+  return v.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
 }
 
+function formatarTelefoneParaWhatsApp(valorMascara) {
+  const numeros = String(valorMascara || "").replace(/\D/g, "");
+  if (!(numeros.length === 10 || numeros.length === 11)) return null;
+  return `55${numeros}`; // ✅ com +
+}
+
+/* =========================================================
+   VALIDAÇÃO FORM
+========================================================= */
 function validarFormulario() {
   const valor = Number(el.valor.value);
-  if (!Number.isFinite(valor) || valor <= 0)
+  if (!Number.isFinite(valor) || valor <= 0) {
     return "Informe um valor válido (maior que 0).";
+  }
 
-    const validade = String(el.validadeEm.value || "").trim();
+  // validade (opcional) - o backend exige "YYYY-MM-DD"
+  const validade = String(el.validadeEm.value || "").trim();
   if (validade) {
-  // só valida se foi preenchida
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(validade))
-    return "Validade inválida. Use o formato YYYY-MM-DD.";
+    // valida formato
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(validade)) {
+      return "Validade inválida. Use o formato YYYY-MM-DD.";
+    }
 
-  const d = new Date(validade + "T00:00:00");
-  if (Number.isNaN(d.getTime()))
-    return "Validade inválida.";
+    // valida data local (sem UTC) só pra checar "passado"
+    const [ano, mes, dia] = validade.split("-").map(Number);
+    const d = new Date(ano, mes - 1, dia, 0, 0, 0, 0);
+    if (Number.isNaN(d.getTime())) return "Validade inválida.";
 
-  const hoje = new Date();
-  const hojeZerado = new Date(
-    hoje.getFullYear(),
-    hoje.getMonth(),
-    hoje.getDate()
-  );
+    const hoje = new Date();
+    const hojeZerado = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    if (d < hojeZerado) return "A validade não pode ser no passado.";
+  }
 
-  if (d < hojeZerado)
-    return "A validade não pode ser no passado.";
-}
-
-  const d = new Date(validade + "T00:00:00");
-  const hoje = new Date();
-  const hojeZerado = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-
-  if (d < hojeZerado)
-    return "A validade não pode ser no passado.";
-
-  const tel = normalizarTelefone(el.telefonePresenteado.value);
-  if (!tel)
-    return "Informe o telefone do presenteado.";
-  if (tel.length < 10)
-    return "Telefone inválido. Use DDI+DDD+número.";
+  // telefone (obrigatório)
+  const telE164 = formatarTelefoneParaWhatsApp(el.telefonePresenteado.value);
+  if (!telE164) {
+    return "Telefone inválido. Digite no formato (DD) 9XXXX-XXXX ou (DD) XXXX-XXXX.";
+  }
 
   const status = String(el.status.value || "").trim();
-  if (status !== "ativo" && status !== "inativo")
+  if (status !== "ativo" && status !== "inativo") {
     return "Status inválido (ativo/inativo).";
+  }
 
   return null;
 }
 
+/* =========================================================
+   API
+========================================================= */
 async function requisicaoApi(caminho, { metodo = "GET", token, body } = {}) {
   const headers = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -178,6 +216,9 @@ async function requisicaoApi(caminho, { metodo = "GET", token, body } = {}) {
   return data;
 }
 
+/* =========================================================
+   CARREGAR RESTAURANTES
+========================================================= */
 async function carregarRestaurantes() {
   const token = obterTokenValido();
   if (!token) return irParaLogin();
@@ -207,6 +248,9 @@ async function carregarRestaurantes() {
   }
 }
 
+/* =========================================================
+   FORM
+========================================================= */
 function limparForm() {
   el.valor.value = "";
   el.validadeEm.value = "";
@@ -227,17 +271,18 @@ async function criarGiftCard() {
   const erro = validarFormulario();
   if (erro) return setAlert(erro);
 
-    const payload = {
+  // payload final (aqui sim, payload existe)
+  const payload = {
     valor: Number(el.valor.value),
     status: String(el.status.value).trim(),
-    telefonePresenteado: normalizarTelefone(el.telefonePresenteado.value),
-    };
+    telefonePresenteado: formatarTelefoneParaWhatsApp(el.telefonePresenteado.value),
+  };
 
-    // validade só entra se preenchida
-    const validade = String(el.validadeEm.value || "").trim();
-    if (validade) {
+  // validade: enviar como YYYY-MM-DD (formato aceito pelo backend)
+  const validade = String(el.validadeEm.value || "").trim();
+  if (validade) {
     payload.validadeEm = validade;
-    }
+  }
 
   setLoading(true);
 
@@ -248,12 +293,7 @@ async function criarGiftCard() {
       body: payload,
     });
 
-    // sucesso
-    el.alert.classList.remove("alert--erro");
-    el.alert.classList.add("alert--sucesso");
-
-    el.alert.hidden = false;
-    el.alert.textContent = `Gift card criado com sucesso, foi enviado uma confirmação no whatsapp da loja e do recebedor! Código: ${result?.codigo || "—"}`;
+    setAlertSucesso(`Gift card criado com sucesso! Código: ${result?.codigo || "—"}`);
     el.alert.scrollIntoView({ behavior: "smooth", block: "start" });
 
     limparForm();
@@ -264,7 +304,9 @@ async function criarGiftCard() {
   }
 }
 
-/* EVENTOS */
+/* =========================================================
+   EVENTOS
+========================================================= */
 el.selectRestaurante.addEventListener("change", () => {
   el.btnContinuar.disabled = !el.selectRestaurante.value;
 });
@@ -294,6 +336,13 @@ el.btnSair.addEventListener("click", () => {
   limparSessao();
   irParaLogin();
 });
+
+// Máscara no input do telefone
+if (el.telefonePresenteado) {
+  el.telefonePresenteado.addEventListener("input", (e) => {
+    e.target.value = aplicarMascaraTelefone(e.target.value);
+  });
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   const token = obterTokenValido();
