@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor - Gift Cards</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+
+  <link rel="stylesheet" href="./css/todosCartoes.css" />
+</head>
+
+<body>
+  <!-- NAVBAR GESTOR -->
+  <header class="navbar">
+    <div class="navbar__content">
+
+      <div class="logo-area">
+        <a class="topbar__brand" href="./todosCartoes.html" aria-label="Início Gestor">
+          <img
+            src="../cliente/assets/image-removebg-preview.png"
+            class="topbar__logo"
+            alt="Logo"
+          />
+        </a>
+      </div>
+
+      <nav class="menu-area" aria-label="Menu do gestor">
+        <ul class="topbar__menu">
+          <li><a class="topbar__link is-active" href="./todosCartoes.html">Gift Cards</a></li>
+          <li><a class="topbar__link" href="./criarGiftcard.html">Criar Gift Cards</a></li>
+          <li><a class="topbar__link" href="./whatsappRestaurante.html">WhatsApp Restaurante</a></li>
+        </ul>
+      </nav>
+
+      <div class="perfil-area">
+        <button id="btnSair" class="btn btn--ghost" type="button" title="Sair">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="heroCard">
+    <div class="heroCard__content">
+      <h1 class="heroCard__title">
+        Gestão de <span class="destaque-vermelho">Gift Cards</span>
+      </h1>
+      <p class="heroCard__subtitle">
+        Selecione um restaurante para visualizar os cartões.
+      </p>
+    </div>
+  </section>
+
+  <!-- GRID / ÁREA -->
+  <main class="wrap">
+
+    <!-- CARD 1: SELEÇÃO (COMEÇA APARECENDO) -->
+    <section id="cardSelect" class="card card--center" aria-label="Selecionar restaurante">
+      <h2 class="card__titulo">Selecionar restaurante</h2>
+      <p class="card__descricao">Escolha um restaurante para carregar os gift cards.</p>
+
+      <div class="campo">
+        <label class="campo__label" for="selectRestaurante">Restaurante</label>
+        <select id="selectRestaurante" class="campo__input">
+          <option value="">Carregando restaurantes...</option>
+        </select>
+        <small class="campo__ajuda" id="restInfo"></small>
+      </div>
+
+      <div id="alertSelect" class="alert" hidden></div>
+
+      <button id="btnContinuar" class="btn btn--primary btn--full" type="button" disabled>
+        Continuar
+      </button>
+    </section>
+
+    <!-- MODAL: ABATER -->
+<section id="modalAbater" class="modal" hidden aria-label="Abater valor do gift card">
+  <div class="modal__overlay" data-close="abater"></div>
+
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modalAbaterTitle">
+    <div class="modal__header">
+      <h3 id="modalAbaterTitle" class="modal__title">Abater valor</h3>
+      <button class="btn btn--ghost" type="button" data-close="abater" title="Fechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <p class="modal__subtitle" id="abaterSub">—</p>
+
+    <div class="campo">
+      <label class="campo__label" for="abaterValor">Valor a abater</label>
+      <input id="abaterValor" class="campo__input" type="number" min="0" step="0.01" placeholder="Ex: 25" />
+      <small class="campo__ajuda">Você pode abater parcial ou total.</small>
+    </div>
+
+    <div id="abaterAlert" class="alert" hidden></div>
+
+    <div class="modal__actions">
+      <button class="btn btn--ghost" type="button" data-close="abater">Cancelar</button>
+      <button id="btnConfirmarAbater" class="btn btn--primary" type="button">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL: EXTRATO -->
+<section id="modalExtrato" class="modal" hidden aria-label="Extrato do gift card">
+  <div class="modal__overlay" data-close="extrato"></div>
+
+  <div class="modal__box modal__box--wide" role="dialog" aria-modal="true" aria-labelledby="modalExtratoTitle">
+    <div class="modal__header">
+      <h3 id="modalExtratoTitle" class="modal__title">Extrato do Gift Card</h3>
+      <button class="btn btn--ghost" type="button" data-close="extrato" title="Fechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <p class="modal__subtitle" id="extratoSub">—</p>
+
+    <div id="extratoLoading" class="loading" hidden>
+      <div class="spinner"></div>
+      <span>Carregando transações...</span>
+    </div>
+
+    <div id="extratoVazio" class="empty" hidden>
+      <i class="fa-regular fa-face-smile"></i>
+      <div>
+        <strong>Nenhuma transação encontrada</strong>
+        <p>Esse gift card ainda não teve movimentações.</p>
+      </div>
+    </div>
+
+    <div id="extratoAlert" class="alert" hidden></div>
+
+    <div id="extratoLista" class="extrato" hidden></div>
+
+    <div class="modal__actions">
+      <button class="btn btn--ghost" type="button" data-close="extrato">Fechar</button>
+    </div>
+  </div>
+</section>
+
+    <!-- CARD 2: RESULTADO (COMEÇA ESCONDIDO) -->
+    <section id="cardResultado" class="card card--fill" hidden aria-label="Gift cards do restaurante">
+        <div class="card__headerRow">
+        <div>
+            <h2 class="card__titulo">Gift Cards do Restaurante</h2>
+            <p class="card__descricao" id="nomeRestSelecionado">—</p>
+        </div>
+
+        <div class="card__headerActions">
+            <a class="btn btn--primary btn--create" href="./criarGiftcard.html" title="Criar novo gift card">
+            <i class="fa-solid fa-plus"></i>
+            <span>Criar novo gift card</span>
+            </a>
+
+            <button id="btnTrocarRest" class="btn btn--ghost" type="button">
+            Trocar restaurante
+            </button>
+        </div>
+        </div>
+
+      <div id="alert" class="alert" hidden></div>
+
+      <div class="toolbar" aria-label="Ferramentas de lista">
+        <div class="campo campo--inline">
+            <label class="campo__label" for="buscaCodigo">Buscar por código</label>
+            <input
+            id="buscaCodigo"
+            class="campo__input"
+            type="text"
+            placeholder="Ex: 86BAE1F0"
+            autocomplete="off"
+            />
+            <small class="campo__ajuda">Filtra em tempo real os cards carregados.</small>
+        </div>
+        </div>
+
+      <div id="loading" class="loading" hidden>
+        <div class="spinner"></div>
+        <span>Carregando cartões...</span>
+      </div>
+
+      <div id="listaVazia" class="empty" hidden>
+        <i class="fa-regular fa-face-smile"></i>
+        <div>
+          <strong>Nenhum gift card encontrado</strong>
+          <p>Crie um novo gift card ou selecione outro restaurante.</p>
+        </div>
+      </div>
+
+      <div id="listaCartoes" class="gridCards" hidden></div>
+    </section>
+
+    <div id="giftcards-container"></div>
+  </main>
+
+  <!-- ONDA -->
+  <section class="ondaTakeat" aria-hidden="true">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path
+        d="M0,55 C240,15 480,95 720,55 C960,15 1200,95 1440,55 L1440,0 L0,0 Z"
+        fill="var(--bg)"
+      />
+    </svg>
+  </section>
+
+  <script src="./js/todosCartoes.js"></script>
+</body>
+</html>
