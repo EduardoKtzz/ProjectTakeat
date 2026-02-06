@@ -77,3 +77,31 @@ SUPABASE_URL=
 SUPABASE_ANON_KEY=
 NODE_ENV=development
 SHOW_OTP=true
+```
+
+## ⚙️ Como rodar?
+
+# instalar dependências
+npm install
+
+# rodar em dev (ajuste conforme seu package.json)
+npm run dev
+
+## 🧪 Roteiro de demo (3–5 minutos)
+
+Abrir o cliente
+Acessar http://localhost:3001/cliente/compra (ou telas em public/cliente)
+Solicitar OTP com telefone
+Em dev, o backend retorna o otp (ou você pode consultar a fila)
+Validar OTP
+Enviar OTP e obter token
+Listar gift cards do telefone autenticado
+Abrir o gestor
+Acessar http://localhost:3001/gestor
+Logar
+Listar restaurantes
+Criar gift card para um restaurante
+Voltar ao cliente
+Atualizar listagem e ver o cartão
+(Opcional) testar abatimento e ver transações
+
