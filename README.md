@@ -3,7 +3,7 @@
 MVP de **Gift Cards para restaurantes**, com fluxo completo de:
 - autenticação do **cliente via OTP (WhatsApp simulado via fila)**,
 - **painel do gestor** (login, restaurantes, criação e gestão de cartões),
-- **compra pública** com confirmação de pagamento simulada,
+- **compra pública** e **consulta** com confirmação de pagamento simulada,
 - persistência em **Supabase**.
 
 > Objetivo: demonstrar entrega ponta-a-ponta e arquitetura organizada (routes → controllers → services → repositories).
