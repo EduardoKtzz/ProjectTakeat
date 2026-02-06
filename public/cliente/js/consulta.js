@@ -1,5 +1,7 @@
 /**
- * CONFIGURAÇÃO DA API (AJUSTE PARA O SEU BACKEND)
+ * =========================
+ * CONFIGURAÇÃO DA API
+ * =========================
  */
 const API = {
   URL_BASE: "http://localhost:3001",
@@ -10,402 +12,381 @@ const API = {
   ENDPOINT_LISTAR_GIFTCARDS: "/cartoes",
 };
 
-const elementos = {
-  formularioTelefone: document.getElementById("form-telefone"),
-  formularioCodigo: document.getElementById("form-codigo"),
-  areaLogada: document.getElementById("area-logada"),
-  otpDev: document.getElementById("otp-dev"),
+/**
+ * =========================
+ * ELEMENTOS DA TELA
+ * =========================
+ */
+const elTelefone = document.getElementById("telefone");
+const elOtp = document.getElementById("otp");
+
+const btnEnviarCodigo = document.getElementById("btnEnviarCodigo");
+const btnValidarCodigo = document.getElementById("btnValidarCodigo");
+const btnReenviar = document.getElementById("btnReenviar");
+const btnSair = document.getElementById("btnSair");
+const mainGrid = document.querySelector(".consulta-grid");
 
 
-  telefone: document.getElementById("telefone"),
-  codigo: document.getElementById("codigo"),
+const blocoOtp = document.getElementById("blocoOtp");
 
-  botaoEnviar: document.getElementById("botao-enviar"),
-  botaoValidar: document.getElementById("botao-validar"),
-  botaoVoltar: document.getElementById("botao-voltar"),
-  botaoReenviar: document.getElementById("botao-reenviar"),
-  botaoSair: document.getElementById("botao-sair"),
+const alertBox = document.getElementById("alert");
+const loading = document.getElementById("loading");
 
-  dicaTemporizador: document.getElementById("dica-temporizador"),
-  toast: document.getElementById("toast"),
-  estado: document.getElementById("estado"),
-  lista: document.getElementById("lista"),
-  telefoneUsuario: document.getElementById("telefone-usuario"),
-  ano: document.getElementById("ano"),
-};
+const listaCartoes = document.getElementById("listaCartoes");
+const listaVazia = document.getElementById("listaVazia");
 
-elementos.ano.textContent = new Date().getFullYear();
+const cardLogin = document.getElementById("cardLogin");
+const cardCartoes = document.getElementById("cardCartoes");
 
-const ARMAZENAMENTO = {
-  telefone: "gc_telefone",
-  token: "gc_token",
-};
+const LS_TOKEN = "cliente_token";
 
-let tempoReenvio = 0;
-let temporizadorReenvio = null;
+/**
+ * =========================
+ * HELPERS UI
+ * =========================
+ */
 
-function aplicarMascaraTelefone(valor) {
-  const digitos = (valor || "").replace(/\D/g, "").slice(0, 11);
-  const d1 = digitos.slice(0, 2);
-  const d2 = digitos.slice(2, 7);
-  const d3 = digitos.slice(7, 11);
 
-  let saida = "";
-  if (d1) saida += `(${d1}`;
-  if (d1.length === 2) saida += ") ";
-  if (d2) saida += d2;
-  if (d2.length === 5) saida += "-";
-  if (d3) saida += d3;
+function mostrarLogin() {
+  cardLogin.hidden = false;
+  cardCartoes.hidden = true;
 
-  return saida;
+  mainGrid?.classList.add("login-central");
+  mainGrid?.classList.remove("result-central");
 }
 
-function normalizarTelefoneE164BR(valor) {
-  // simples: assume Brasil (55) quando necessário
-  const digitos = (valor || "").replace(/\D/g, "");
-  if (!digitos) return "";
+function mostrarCartoes() {
+  cardLogin.hidden = true;
+  cardCartoes.hidden = false;
 
-  if (digitos.startsWith("55")) return `+${digitos}`;
-  if (digitos.length === 10 || digitos.length === 11) return `+55${digitos}`;
-
-  return `+${digitos}`;
+  mainGrid?.classList.remove("login-central");
+  mainGrid?.classList.add("result-central");
 }
 
-function mostrarToast(mensagem) {
-  elementos.toast.textContent = mensagem;
-  elementos.toast.classList.remove("escondido");
-  window.clearTimeout(mostrarToast._t);
-  mostrarToast._t = window.setTimeout(() => {
-    elementos.toast.classList.add("escondido");
-  }, 4500);
+function setAlert(msg, inputFocus) {
+  alertBox.textContent = msg;
+  alertBox.hidden = false;
+
+  if (inputFocus) inputFocus.classList.add("input--error");
+
+  alertBox.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
-function definirEstado(mensagem) {
-  if (!mensagem) {
-    elementos.estado.classList.add("escondido");
-    elementos.estado.textContent = "";
-    return;
-  }
-  elementos.estado.textContent = mensagem;
-  elementos.estado.classList.remove("escondido");
-}
+function clearAlert() {
+  alertBox.hidden = true;
+  alertBox.textContent = "";
 
-function definirCarregando(botao, carregando) {
-  botao.disabled = carregando;
-  botao.style.opacity = carregando ? "0.7" : "1";
-  botao.textContent = carregando ? "Aguarde..." : botao.dataset.rotulo;
-}
-
-async function requisicaoApi(caminho, { metodo = "GET", corpo, token } = {}) {
-  const cabecalhos = { "Content-Type": "application/json" };
-  if (token) cabecalhos.Authorization = `Bearer ${token}`;
-
-  const res = await fetch(`${API.URL_BASE}${API.PREFIXO}${caminho}`, {
-    method: metodo,
-    headers: cabecalhos,
-    body: corpo ? JSON.stringify(corpo) : undefined,
+  document.querySelectorAll(".input--error").forEach((el) => {
+    el.classList.remove("input--error");
   });
+}
 
-  // tenta interpretar resposta como JSON, se não der, cai pra texto
-  let dados = null;
-  const tipoConteudo = res.headers.get("content-type") || "";
+function setLoading(isLoading) {
+  loading.hidden = !isLoading;
 
-  if (tipoConteudo.includes("application/json")) {
-    dados = await res.json().catch(() => null);
-  } else {
-    dados = await res.text().catch(() => null);
+  btnEnviarCodigo.disabled = isLoading;
+  btnValidarCodigo.disabled = isLoading;
+  btnReenviar.disabled = isLoading;
+}
+
+function showOtp(show) {
+  blocoOtp.hidden = !show;
+}
+
+function setLoggedIn(isLoggedIn) {
+  if (btnSair) btnSair.disabled = !isLoggedIn;
+
+  if (!isLoggedIn) {
+    localStorage.removeItem(LS_TOKEN);
+  }
+}
+
+function setListVisible(visible) {
+  listaCartoes.hidden = !visible;
+}
+
+function setEmptyVisible(visible) {
+  listaVazia.hidden = !visible;
+}
+
+/**
+ * =========================
+ * FORMATAÇÕES
+ * =========================
+ */
+
+function formatBRL(value) {
+  const n = Number(value);
+  if (Number.isNaN(n)) return "-";
+
+  return n.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function formatarTelefone(valor) {
+  let digits = valor.replace(/\D/g, "");
+  digits = digits.slice(0, 11);
+
+  if (digits.length <= 2) return digits;
+
+  if (digits.length <= 7) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
   }
 
-  if (!res.ok) {
-  let mensagem = `Erro HTTP ${res.status}`;
-
-  if (dados && typeof dados === "object") {
-    mensagem =
-      dados.message ||
-      dados.error ||
-      (Array.isArray(dados.errors) ? dados.errors.join(", ") : null) ||
-      JSON.stringify(dados);
-  }
-
-  if (typeof dados === "string" && dados.trim()) {
-    mensagem = dados;
-  }
-
-  throw new Error(mensagem);
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
-  return dados;
+function normalizarTelefone(valor) {
+  const digits = String(valor || "").replace(/\D/g, "");
+
+  // Usuário digitou já com DDI (55) -> 13 dígitos
+  if (digits.length === 13 && digits.startsWith("55")) return digits;
+
+  // Usuário digitou só DDD + número -> 11 dígitos
+  if (digits.length === 11) return "55" + digits;
+
+  return null;
 }
 
-function definirEtapa(etapa) {
-  // etapa: "telefone" | "codigo" | "logado"
-  elementos.formularioTelefone.classList.toggle("escondido", etapa !== "telefone");
-  elementos.formularioCodigo.classList.toggle("escondido", etapa !== "codigo");
-  elementos.areaLogada.classList.toggle("escondido", etapa !== "logado");
-}
+/**
+ * =========================
+ * RENDERIZAÇÃO DOS CARTÕES
+ * =========================
+ */
 
-function iniciarTempoReenvio(segundos = 30) {
-  tempoReenvio = segundos;
-  elementos.botaoReenviar.disabled = true;
-  elementos.dicaTemporizador.textContent = `Você poderá reenviar em ${tempoReenvio}s.`;
+function renderCartoes(cartoes) {
+  listaCartoes.innerHTML = "";
 
-  if (temporizadorReenvio) window.clearInterval(temporizadorReenvio);
+  cartoes.forEach((c, idx) => {
+    const codigo = c.codigo ?? c.code ?? "-";
+    const saldo = c.saldo ?? c.balance ?? 0;
+    const status = (c.status ?? "ativo").toString();
+    const validade = c.validade ?? c.expiresAt ?? "—";
 
-  temporizadorReenvio = window.setInterval(() => {
-    tempoReenvio -= 1;
+    const card = document.createElement("div");
+    card.className = "cartao";
 
-    if (tempoReenvio <= 0) {
-      window.clearInterval(temporizadorReenvio);
-      temporizadorReenvio = null;
-      elementos.botaoReenviar.disabled = false;
-      elementos.dicaTemporizador.textContent = "Se não recebeu, você pode reenviar o código.";
-      return;
-    }
+    card.innerHTML = `
+      <div class="cartao__top">
+        <p class="cartao__titulo">Gift Card #${idx + 1}</p>
 
-    elementos.dicaTemporizador.textContent = `Você poderá reenviar em ${tempoReenvio}s.`;
-  }, 1000);
-}
-
-function formatarMoedaBRL(valor) {
-  const n = Number(valor || 0);
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function formatarDataBR(valor) {
-  if (!valor) return "-";
-  const data = new Date(valor);
-  if (Number.isNaN(data.getTime())) return String(valor);
-  return data.toLocaleDateString("pt-BR");
-}
-
-function textoStatus(status) {
-  const s = String(status || "").toLowerCase();
-
-  // ajuste conforme seu backend
-  if (["ativo", "ativa", "valid", "valido", "válido"].includes(s)) return "Ativo";
-  if (["usado", "consumido", "redeemed"].includes(s)) return "Usado";
-  if (["expirado", "expired"].includes(s)) return "Expirado";
-
-  return status || "—";
-}
-
-function classeStatus(status) {
-  const s = String(status || "").toLowerCase();
-  if (["expirado", "expired"].includes(s)) return "selo-status selo-status--alerta";
-  return "selo-status selo-status--ok";
-}
-
-function limparLista() {
-  elementos.lista.innerHTML = "";
-}
-
-function renderizarLista(giftcards) {
-  limparLista();
-
-  if (!Array.isArray(giftcards) || giftcards.length === 0) {
-    definirEstado("Nenhum gift card encontrado para este número.");
-    return;
-  }
-
-  definirEstado("");
-
-  giftcards.forEach((gc) => {
-    // mapeamento flexível (para bater com diferentes nomes vindos do backend)
-    const codigo = gc.codigo || gc.code || gc.numero || "Gift Card";
-    const saldo = gc.valorRestante ?? gc.saldo ?? gc.restante ?? gc.balance ?? 0;
-    const status = gc.status || gc.situacao || gc.state || "—";
-    const validade = gc.validade || gc.expiraEm || gc.dataValidade || gc.expiresAt || null;
-
-    const item = document.createElement("div");
-    item.className = "item-giftcard";
-
-    item.innerHTML = `
-      <div class="item-giftcard__topo">
-        <div class="item-giftcard__codigo">${codigo}</div>
-        <div class="${classeStatus(status)}">${textoStatus(status)}</div>
+        <span class="cartao__status">
+          <i class="fa-solid fa-circle-check"></i>
+          ${status}
+        </span>
       </div>
 
-      <div class="item-giftcard__grid">
-        <div class="indicador">
-          <div class="indicador__rotulo">Valor restante</div>
-          <div class="indicador__valor">${formatarMoedaBRL(saldo)}</div>
+      <div class="cartao__grid">
+        <div class="kv">
+          <div class="kv__k">Código</div>
+          <div class="kv__v kv__mono">${codigo}</div>
         </div>
 
-        <div class="indicador">
-          <div class="indicador__rotulo">Status</div>
-          <div class="indicador__valor">${textoStatus(status)}</div>
+        <div class="kv">
+          <div class="kv__k">Saldo</div>
+          <div class="kv__v">${formatBRL(saldo)}</div>
         </div>
 
-        <div class="indicador">
-          <div class="indicador__rotulo">Validade</div>
-          <div class="indicador__valor">${formatarDataBR(validade)}</div>
+        <div class="kv">
+          <div class="kv__k">Validade</div>
+          <div class="kv__v">${validade}</div>
+        </div>
+
+        <div class="kv">
+          <div class="kv__k">Uso</div>
+          <div class="kv__v">WhatsApp</div>
         </div>
       </div>
     `;
 
-    elementos.lista.appendChild(item);
+    listaCartoes.appendChild(card);
   });
 }
 
-async function listarGiftcards() {
-  const token = localStorage.getItem(ARMAZENAMENTO.token);
-  const telefone = localStorage.getItem(ARMAZENAMENTO.telefone);
+/**
+ * =========================
+ * API REQUESTS
+ * =========================
+ */
 
-  if (!token || !telefone) {
-    definirEtapa("telefone");
-    return;
+async function requestOtp(telefone) {
+  const resp = await fetch(
+    `${API.URL_BASE}${API.PREFIXO}${API.ENDPOINT_ENVIAR_CODIGO}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ telefone }),
+    }
+  );
+
+  const data = await resp.json().catch(() => ({}));
+
+  if (!resp.ok) {
+    throw new Error(data?.error || "Erro ao enviar OTP.");
   }
 
-  definirEtapa("logado");
-  elementos.telefoneUsuario.textContent = telefone;
-
-  try {
-    definirEstado("Carregando seus gift cards...");
-    const dados = await requisicaoApi(API.ENDPOINT_LISTAR_GIFTCARDS, { token });
-
-    // aceite comum: API retorna { data: [...] } ou retorna direto [...]
-const lista = Array.isArray(dados)
-  ? dados
-  : (dados?.cartoes || dados?.data || dados?.giftcards || []);    renderizarLista(lista);
-  } catch (erro) {
-    definirEstado("");
-    mostrarToast(erro.message || "Não foi possível carregar seus gift cards.");
+  // DEV: mostrar OTP se backend devolver
+  const otpDev = document.getElementById("otp-dev");
+  if (otpDev && data?.otp) {
+    otpDev.hidden = false;
+    otpDev.textContent = `⚠️ OTP Simulado: ${data.otp}`;
+    elOtp.value = data.otp;
   }
+
+  return data;
+}
+
+async function verifyOtp(telefone, otp) {
+  const resp = await fetch(
+    `${API.URL_BASE}${API.PREFIXO}${API.ENDPOINT_VALIDAR_CODIGO}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ telefone, otp }),
+    }
+  );
+
+  const data = await resp.json().catch(() => ({}));
+
+  if (!resp.ok) {
+    throw new Error(data?.error || "Código inválido.");
+  }
+
+  return data.token || data.access_token;
+}
+
+async function listarCartoes() {
+  const token = localStorage.getItem(LS_TOKEN);
+
+  const resp = await fetch(
+    `${API.URL_BASE}${API.PREFIXO}${API.ENDPOINT_LISTAR_GIFTCARDS}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await resp.json().catch(() => ({}));
+
+  if (!resp.ok) {
+    throw new Error(data?.error || "Erro ao carregar cartões.");
+  }
+
+  return Array.isArray(data) ? data : data.cartoes || [];
 }
 
 /**
+ * =========================
  * EVENTOS
+ * =========================
  */
-elementos.telefone.addEventListener("input", (e) => {
-  e.target.value = aplicarMascaraTelefone(e.target.value);
-});
 
-elementos.botaoEnviar.dataset.rotulo = elementos.botaoEnviar.textContent;
-elementos.botaoValidar.dataset.rotulo = elementos.botaoValidar.textContent;
+btnEnviarCodigo.addEventListener("click", async () => {
+  clearAlert();
 
-elementos.formularioTelefone.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  const telefone = normalizarTelefone(elTelefone.value);
 
-  const telefoneDigitado = elementos.telefone.value;
-  const telefoneE164 = normalizarTelefoneE164BR(telefoneDigitado);
-
-  if (!telefoneE164) {
-    mostrarToast("Informe um telefone válido.");
+  if (!telefone) {
+    setAlert("Digite um WhatsApp válido.", elTelefone);
     return;
   }
 
+  setLoading(true);
+
   try {
-    definirCarregando(elementos.botaoEnviar, true);
-    const resposta = await requisicaoApi(API.ENDPOINT_ENVIAR_CODIGO, {
-    metodo: "POST",
-    corpo: { telefone: telefoneE164 },
-    });
+    await requestOtp(telefone);
 
-    localStorage.setItem(ARMAZENAMENTO.telefone, telefoneE164);
-    definirEtapa("codigo");
-    iniciarTempoReenvio(30);
+    showOtp(true);
+    elOtp.focus();
+  } catch (e) {
+    setAlert(e.message);
+  } finally {
+    setLoading(false);
+  }
+});
 
-    // ✅ Se estiver em DEV e backend devolveu otp:
-    const otpDev = document.getElementById("otp-dev");
-    if (resposta?.otp) {
-    otpDev.textContent = `⚠️ Ambiente DEV: código gerado = ${resposta.otp}`;
-    otpDev.classList.remove("escondido");
-    elementos.codigo.value = resposta.otp;
+btnValidarCodigo.addEventListener("click", async () => {
+  clearAlert();
+
+  const telefone = normalizarTelefone(elTelefone.value);
+  const otp = String(elOtp.value || "").trim();
+
+  if (!telefone) {
+    setAlert("WhatsApp inválido.", elTelefone);
+    return;
+  }
+
+  if (!otp) {
+    setAlert("Digite o código OTP.", elOtp);
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // valida OTP
+    const token = await verifyOtp(telefone, otp);
+
+    localStorage.setItem(LS_TOKEN, token);
+    setLoggedIn(true);
+
+    // carrega cartões
+    const cartoes = await listarCartoes();
+
+    // troca tela
+    mostrarCartoes();
+
+    if (!cartoes.length) {
+      setEmptyVisible(true);
     } else {
-    otpDev.classList.add("escondido");
+      renderCartoes(cartoes);
+      setListVisible(true);
     }
-
-    elementos.codigo.focus();
-  } catch (erro) {
-    mostrarToast(erro.message || "Não foi possível enviar o código.");
+  } catch (e) {
+    setAlert(e.message);
+    setLoggedIn(false);
   } finally {
-    definirCarregando(elementos.botaoEnviar, false);
+    setLoading(false);
   }
 });
 
-elementos.formularioCodigo.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const telefone = localStorage.getItem(ARMAZENAMENTO.telefone);
-  const codigo = (elementos.codigo.value || "").trim();
-
-  if (!telefone) {
-    definirEtapa("telefone");
-    return;
-  }
-
-  if (!codigo || codigo.length < 4) {
-    mostrarToast("Informe o código recebido.");
-    return;
-  }
-
-  try {
-    definirCarregando(elementos.botaoValidar, true);
-
-    const resposta = await requisicaoApi(API.ENDPOINT_VALIDAR_CODIGO, {
-      metodo: "POST",
-      corpo: { telefone, otp: codigo },
-    });
-
-    // aceite comum: { token: "..." } ou { data: { token } }
-    const token = resposta?.token || resposta?.data?.token || resposta?.access_token;
-
-    if (!token) {
-      throw new Error("Token não retornado pela API. Verifique o endpoint de validação.");
-    }
-
-    localStorage.setItem(ARMAZENAMENTO.token, token);
-
-    mostrarToast("Acesso liberado! Carregando seus gift cards...");
-    await listarGiftcards();
-  } catch (erro) {
-    mostrarToast(erro.message || "Código inválido ou expirado.");
-  } finally {
-    definirCarregando(elementos.botaoValidar, false);
-  }
+btnReenviar.addEventListener("click", async () => {
+  btnEnviarCodigo.click();
 });
 
-elementos.botaoVoltar.addEventListener("click", () => {
-  elementos.codigo.value = "";
-  definirEtapa("telefone");
-});
+if (btnSair) {
+  btnSair.addEventListener("click", () => {
+    clearAlert();
 
-elementos.botaoReenviar.addEventListener("click", async () => {
-  if (tempoReenvio > 0) return;
+    setLoggedIn(false);
+    showOtp(false);
 
-  const telefone = localStorage.getItem(ARMAZENAMENTO.telefone);
-  if (!telefone) {
-    definirEtapa("telefone");
-    return;
-  }
+    elOtp.value = "";
+    elTelefone.value = "";
 
-  try {
-    elementos.botaoReenviar.disabled = true;
-    await requisicaoApi(API.ENDPOINT_ENVIAR_CODIGO, {
-      metodo: "POST",
-      corpo: { telefone },
-    });
+    setListVisible(false);
+    setEmptyVisible(false);
 
-    iniciarTempoReenvio(30);
-    mostrarToast("Código reenviado! Verifique seu WhatsApp.");
-  } catch (erro) {
-    elementos.botaoReenviar.disabled = false;
-    mostrarToast(erro.message || "Não foi possível reenviar o código.");
-  }
-});
-
-elementos.botaoSair.addEventListener("click", () => {
-  localStorage.removeItem(ARMAZENAMENTO.token);
-  localStorage.removeItem(ARMAZENAMENTO.telefone);
-  elementos.telefone.value = "";
-  elementos.codigo.value = "";
-  limparLista();
-  definirEstado("");
-  definirEtapa("telefone");
-  mostrarToast("Você saiu.");
-});
+    mostrarLogin();
+  });
+}
 
 /**
- * INÍCIO
+ * =========================
+ * INIT
+ * =========================
  */
-listarGiftcards();
+
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarLogin();
+  showOtp(false);
+
+  // máscara telefone
+  elTelefone.addEventListener("input", () => {
+    elTelefone.value = formatarTelefone(elTelefone.value);
+  });
+});
