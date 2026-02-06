@@ -12,159 +12,169 @@
       rel="stylesheet"
     />
 
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
     <link rel="stylesheet" href="./style/compra.css" />
   </head>
 
   <body>
-    <!-- NAVBAR (agora branca) -->
+    <!-- NAVBAR -->
     <header class="navbar">
       <div class="navbar__content">
-        <a class="topbar__brand" href="./index.html">
-          <img
-            class="topbar__logo"
-            src="./assets/image-removebg-preview.png"
-            alt="Nome da empresa"
-          />
-        </a>
+        <!-- Logo -->
+        <div class="logo-area">
+          <a class="topbar__brand" href="../cliente/compra.html">
+            <img src="./assets/image-removebg-preview.png" class="topbar__logo" alt="Logo" />
+          </a>
+        </div>
 
-        <nav aria-label="Navegação principal">
+        <!-- Menu -->
+        <nav class="menu-area" aria-label="Menu principal">
           <ul class="topbar__menu">
-            <li><a class="topbar__link is-active" href="./compra.html">Comprar GiftCard</a></li>
-            <li><a class="topbar__link" href="./consulta.html">Consultar meu GiftCard</a></li>
+            <li><a class="topbar__link is-active" href="../cliente/compra.html">Comprar GiftCard</a></li>
+            <li><a class="topbar__link" href="../cliente/consulta.html">Consultar meu GiftCard</a></li>
           </ul>
         </nav>
 
-        <a class="btn btn--topbar" href="./gestor.html">Você é dono? Clique aqui!</a>
+        <!-- Perfil -->
+        <div class="perfil-area">
+          <a class="icone-perfil" href="../gestor/index.html" title="Área do gestor" aria-label="Área do gestor">
+            <i class="fa-solid fa-user"></i>
+          </a>
+        </div>
       </div>
     </header>
 
-    <!-- CARD DO TÍTULO -->
+    <!-- TÍTULO -->
     <section class="heroCard">
       <div class="heroCard__content">
-        <h1 class="heroCard__title">Compre um Gift Card Digital</h1>
+        <h1 class="heroCard__title">
+          Compre um <span class="destaque-vermelho">Gift Card</span> Digital
+        </h1>
         <p class="heroCard__subtitle">Presenteie alguém com um cartão de presente!</p>
       </div>
     </section>
 
-    <main class="container">
-      <section class="card">
-        <div class="card__header">
-          <h2 class="card__title">Dados da compra</h2>
-          <p class="card__help">
-            Preencha e confirme. Após o pagamento, um gift card será gerado na sua conta.
+    <!-- TELA 1: COMPRA -->
+    <section class="compra-grid">
+      <!-- COLUNA 1 -->
+      <aside class="card card--sticky">
+        <h2 class="card__titulo">Escolha o valor</h2>
+        <p class="card__descricao">Selecione um valor ou digite um valor personalizado.</p>
+
+        <div class="opcoes">
+          <button class="opcao" type="button" data-valor="25">R$ 25</button>
+          <button class="opcao" type="button" data-valor="50">R$ 50</button>
+          <button class="opcao" type="button" data-valor="100">R$ 100</button>
+          <button class="opcao" type="button" data-valor="150">R$ 150</button>
+        </div>
+
+        <div class="campo">
+          <label class="campo__label" for="valorPersonalizado">Ou digite um valor</label>
+          <input class="campo__input" id="valorPersonalizado" type="number" placeholder="Ex: 75" />
+          <small class="campo__ajuda">O valor final será usado para gerar o gift card.</small>
+        </div>
+
+        <div class="resumo">
+          <div class="resumo__linha">
+            <span>Valor do Gift Card</span>
+            <strong id="resumoValor">R$ 0</strong>
+          </div>
+          <div class="resumo__linha resumo__total">
+            <span>Total</span>
+            <strong id="resumoTotal">R$ 0</strong>
+          </div>
+        </div>
+
+        <div class="acoes acoes--coluna">
+          <!-- IMPORTANTE: id para o JS -->
+          <button id="btnCriarCompra" class="btn btn--primary" type="button">Comprar</button>
+        </div>
+
+        <!-- Alerta da tela de compra -->
+        <div id="alert" class="alert alert--center" hidden></div>
+      </aside>
+
+      <!-- COLUNA 2 -->
+      <div class="card">
+        <h2 class="card__titulo">Dados do presente</h2>
+        <p class="card__descricao">Preencha para enviar o gift card para a pessoa certa.</p>
+
+        <div class="campo">
+          <label class="campo__label" for="nomeComprador">Quem está comprando</label>
+          <input class="campo__input" id="nomeComprador" type="text" placeholder="Ex: Eduardo" />
+        </div>
+
+        <div class="campo">
+          <label class="campo__label" for="nomePresenteado">Quem está recebendo</label>
+          <input class="campo__input" id="nomePresenteado" type="text" placeholder="Ex: João" />
+        </div>
+
+        <div class="campo">
+          <label class="campo__label" for="telefonePresenteado">Telefone do presenteado</label>
+          <input class="campo__input" id="telefonePresenteado" type="tel" placeholder="Ex: 5511999999999" />
+          <small class="campo__ajuda">Esse telefone receberá o gift card no WhatsApp.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- TELA 2: PAGAMENTO (inicia escondida) -->
+    <section class="pagamento" id="telaPagamento" hidden>
+      <div class="pagamento__card">
+        <div class="pagamento__header">
+          <h2 class="pagamento__titulo">Pagamento</h2>
+          <p class="pagamento__descricao">
+            Escaneie o QR Code para pagar. Tempo restante:
+            <strong id="timerPagamento">05:00</strong>
           </p>
         </div>
 
-        <form id="form-compra" class="form" novalidate>
-          <!-- Valor -->
-          <div class="field">
-            <label class="label">Valor do gift card</label>
+        <div class="pagamento__grid">
+          <div class="pagamento__qr">
+            <img
+              id="qrImagem"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=pix-simulado-giftcard"
+              alt="QR Code de pagamento"
+            />
+          </div>
 
-            <div class="value-cards" role="group" aria-label="Selecionar valor">
-              <button type="button" class="value-card" data-value="25">
-                <div class="value-card__top">
-                  <span class="value-card__badge">Inicial</span>
-                  <span class="value-card__icon" aria-hidden="true">🎁</span>
-                </div>
-                <div class="value-card__price">R$ 25</div>
-              </button>
+          <div class="pagamento__info">
+            <div class="pagamento__box">
+              <div class="pagamento__linha">
+                <span>Valor</span>
+                <strong id="pagamentoValor">R$ 0</strong>
+              </div>
+              <div class="pagamento__linha">
+                <span>Beneficiário</span>
+                <strong id="pagamentoPresenteado">-</strong>
+              </div>
+              <div class="pagamento__linha">
+                <span>Telefone</span>
+                <strong id="pagamentoTelefone">-</strong>
+              </div>
+            </div>
 
-              <button type="button" class="value-card" data-value="50">
-                <div class="value-card__top">
-                  <span class="value-card__badge">Mais escolhido</span>
-                  <span class="value-card__icon" aria-hidden="true">🔥</span>
-                </div>
-                <div class="value-card__price">R$ 50</div>
-              </button>
-
-              <button type="button" class="value-card" data-value="100">
-                <div class="value-card__top">
-                  <span class="value-card__badge">Avançado</span>
-                  <span class="value-card__icon" aria-hidden="true">✨</span>
-                </div>
-                <div class="value-card__price">R$ 100</div>
-              </button>
-
-              <button type="button" class="value-card" data-value="150">
-                <div class="value-card__top">
-                  <span class="value-card__badge">Completo</span>
-                  <span class="value-card__icon" aria-hidden="true">🏆</span>
-                </div>
-                <div class="value-card__price">R$ 150</div>
+            <div class="pagamento__acoes">
+              <button id="btnVoltar" class="btn btn--ghost" type="button">Voltar</button>
+              <button id="btnConfirmarPagamento" class="btn btn--primary" type="button">
+                Confirmar pagamento
               </button>
             </div>
 
-            <div class="inline">
-              <label class="label label--small" for="valorCustom">Ou digite um valor</label>
-              <input
-                id="valorCustom"
-                name="valorCustom"
-                class="input"
-                inputmode="decimal"
-                placeholder="Ex: 75"
-              />
-            </div>
-
-            <p class="hint">O valor final será usado para gerar o cartão.</p>
-
-          <hr class="divider" />
-
-          <!-- Quem compra -->
-          <div class="field">
-            <label class="label" for="compradorNome">Quem está comprando</label>
-            <input
-              id="compradorNome"
-              name="compradorNome"
-              class="input"
-              placeholder="Ex: Eduardo"
-            />
+            <div id="pagamentoAlerta" class="alert alert--center" hidden></div>
           </div>
-
-                    <!-- Quem compra -->
-          <div class="field">
-            <label class="label" for="recebedorNome">Quem está recebendo</label>
-            <input
-              id="recebedorNome"
-              name="recebedorNome"
-              class="input"
-              placeholder="Ex: João"
-            />
-          </div>
-
-          <!-- Quem recebe -->
-          <div class="field">
-            <label class="label" for="telefonePresenteado">Telefone do presenteado</label>
-            <input
-              id="telefonePresenteado"
-              name="telefonePresenteado"
-              class="input"
-              inputmode="tel"
-              placeholder="Ex: 5511999999999"
-              required
-            />
-            <p class="hint">Esse telefone receberá o gift card no WhatsApp.</p>
-          </div>
-
-          <!-- Ações -->
-          <div class="actions">
-            <button id="btnCriarCompra" class="btn btn--primary" type="submit">
-              Comprar
-            </button>
-
-            <button id="btnConfirmarPagamento" class="btn btn--ghost" type="button" disabled>
-              Confirmar pagamento
-            </button>
-          </div>
-
-          <div id="alert" class="alert" hidden></div>
-        </form>
-      </section>
-
-      <section class="card" id="resultado" hidden>
-        <div class="card__header">
-          <h2 class="card__title">Resultado</h2>
-          <p class="card__help">Aqui você vê os dados gerados no MVP.</p>
         </div>
+      </div>
+    </section>
+
+    <!-- TELA 3: SUCESSO (inicia escondida) -->
+    <section class="sucesso" id="telaSucesso" hidden>
+      <div class="sucesso__card">
+        <h2 class="sucesso__titulo">Pagamento confirmado ✅</h2>
+        <p class="sucesso__descricao">Seu gift card foi gerado com sucesso.</p>
 
         <div class="result-grid">
           <div class="result-item">
@@ -189,20 +199,19 @@
         </div>
 
         <div class="actions">
-          <button id="btnNovaCompra" class="btn btn--secondary" type="button">
-            Fazer outra compra
-          </button>
+          <button id="btnNovaCompra" class="btn btn--ghost" type="button">Fazer outra compra</button>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
 
-     <!-- ONDA FULL-WIDTH (fora do container) -->
-    <section class="brandWave" aria-hidden="true">
+    <!-- ONDA FULL-WIDTH -->
+    <section class="ondaTakeat" aria-hidden="true">
       <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <!-- Recorte: pinta o "branco" por cima do vermelho -->
         <path
-          d="M0,80 C240,20 480,140 720,80 960,20 1200,140 1440,80 L1440,120 L0,120 Z"
-          fill="var(--red)"
-        ></path>
+          d="M0,55 C240,15 480,95 720,55 C960,15 1200,95 1440,55 L1440,0 L0,0 Z"
+          fill="var(--bg)"
+        />
       </svg>
     </section>
 

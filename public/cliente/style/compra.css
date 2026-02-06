@@ -1,477 +1,649 @@
 :root {
-  --red: #9b0d1c;
-  --red-dark: #7f0a16;
-
-  --bg: #f3f4f6;
-  --card: #ffffff;
-
-  --text: #111827;
-  --muted: #6b7280;
-
-  --border: #e5e7eb;
-  --shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-
-  --radius: 16px;
+   --red: #9b0d1c;
+   --red-dark: #7f0a16;
+   --bg: #f3f4f6;
+   --card: #ffffff;
+   --text: #111827;
+   --muted: #6b7280;
+   --border: #e5e7eb;
+   --shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+   --radius: 16px;
 }
 
-* { box-sizing: border-box; }
+* {
+   box-sizing: border-box;
+}
 
 body {
-  margin: 0;
-  font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color: var(--text);
-  background: var(--bg);
+   margin: 0;
+   font-family:"Poppins", system-ui, -apple-system,Segoe UI, Roboto, Arial, sans-serif;
+   background: var(--bg);
 }
 
-/* =========================
-   NAVBAR (branca)
-========================= */
+/* NAVBAR */
 .navbar {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
+   background: #fff;
+   border-bottom: 1px solid var(--border);
 }
 
+/* NAVBAR: conteudo */
 .navbar__content {
-  width: min(980px, calc(100% - 32px));
-  margin: 0 auto;
+  margin: 0 40px;
   padding: 14px 0;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 16px;
 }
 
-/* força o meio a centralizar */
-nav {
-  flex: 1;                 /* ocupa o espaço entre logo e CTA */
+/* NAVBAR: centralizar o meio do menu */
+.navbar__content nav{
   display: flex;
-  justify-content: center;  /* centraliza o menu */
+  justify-content: center;
 }
 
-.topbar__brand {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-/* Logo */
+/* NAVBAR: Logo */
 .topbar__logo {
-  height: 56px;
-  width: auto;
-  display: block;
+   height: 56px;
+   width: auto;
+   display: block;
 }
 
-/* Menu */
+/* NAVBAR: Menu */
 .topbar__menu {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  padding: 0;
-  margin: 0;
+   list-style: none;
+   display: flex;
+   gap: 22px;
+   padding: 0;
+   margin: 0;
 }
 
-/* Links: cor fixa, underline no hover/active */
+/* NAVBAR: Links */
 .topbar__link {
-  position: relative;
-  text-decoration: none;
-  color: #040404;
-  font-weight: 600;
-  font-size: 16px;
-  padding: 6px 0;
-  transition: transform 0.2s ease;
+   position: relative;
+   text-decoration: none;
+   color: #040404;
+   font-weight: 600;
+   font-size: 18px;
+   padding: 6px 0;
+   transition: transform 0.2s ease;
 }
 
+/* NAVBAR: Links depois de clicado */
 .topbar__link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -7px;
-  width: 100%;
-  height: 2px;
-  background: var(--red);
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 0.2s ease;
+   content: "";
+   position: absolute;
+   left: 0;
+   bottom: -7px;
+   width: 100%;
+   height: 2px;
+   background: var(--red);
+   transform: scaleX(0);
+   transform-origin: center;
+   transition: transform 0.2s ease;
 }
 
-.topbar__link:hover { transform: scale(1.06); }
-.topbar__link:hover::after { transform: scaleX(1); }
+.topbar__link:hover::after {
+   transform: scaleX(1);
+}
 
-.topbar__link.is-active::after { transform: scaleX(1); }
+.topbar__link.is-active::after {
+   transform: scaleX(1);
+}
 
-/* CTA */
-.btn--topbar {
-  height: 46px;
-  padding: 0 18px;
-  border-radius: 999px;
-  text-decoration: none;
-
-  background: rgb(228, 228, 228);
-  border: 1px solid rgb(255, 255, 255);
-  color: #000;
-
-  display: inline-flex;
+/* NAVBAR: Icone de usuario */
+.icone-perfil{
+  width: 44px;
+  height: 44px;
+  border-radius: 69px;
+  border: 1px solid #040404;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-   margin-left: auto; /* garante que ele encoste à direita */
-
+  color: #040404;
+  font-size: 22px;
+  cursor: pointer;
 }
 
-.topbar__brand,
-.btn--topbar {
-  min-width: 180px;  /* ajuste conforme sua logo/CTA */
+.perfil-area {
+  justify-self: end;
 }
 
-.topbar__brand { justify-content: flex-start; }
-.btn--topbar { justify-content: flex-end; }
-
-.btn--topbar:hover {
-  background: rgb(240, 240, 240);
-  border-color: rgb(255, 255, 255);
-}
-
-/* =========================
-   CARD do título
-========================= */
+/* TITULO: container */
 .heroCard {
-  background: transparent;
-  padding: 18px 0 6px;
-  text-align: center;
+   padding: 18px 0 6px;
+   text-align: center;
 }
-
+/* TITULO: conteudo */
 .heroCard__content {
-  width: min(980px, calc(100% - 32px));
-  margin: 0 auto;
-
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 18px;
+   border-radius: var(--radius);
+   padding: 25px;
 }
 
+/* TITULO */
 .heroCard__title {
-  margin: 0 0 6px;
-  color: var(--red);
-  font-size: 40px;
-  line-height: 1.1;
-  font-weight: 800;
+   margin: 0 0 6px;
+   color: #111;
+   font-size: 70px;
+   line-height: 1.1;
+}
+
+/* TITULO: cor de destaque no vermelho */
+.destaque-vermelho {
+  color: var(--red); 
 }
 
 .heroCard__subtitle {
-  margin: 0;
-  color: var(--muted);
-    font-size: 20px;
+   margin: 0;
+   color: var(--muted);
+   font-size: 22px;
 }
 
 /* =========================
-   LAYOUT
-========================= */
-.container {
-  width: min(980px, calc(100% - 32px));
-  margin: 16px auto -30px;
+   LAYOUT (2 colunas iguais)
+   ========================= */
+
+.compra-grid{
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 22px 20px 10px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* mesmo tamanho */
+  gap: 22px;
+  align-items: stretch; /* mesma altura */
 }
 
-.card {
+/* Cards com aparência mais “site” */
+.card{
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 18px;
-  margin-bottom: 16px;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  padding: 22px;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 420px; /* garante alturas parecidas */
 }
 
-.card__header { margin-bottom: 14px; }
-
-.card__title {
+.card__titulo{
   margin: 0 0 6px;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
-.card__help {
-  margin: 0;
+.card__descricao{
+  margin: 0 0 18px;
   color: var(--muted);
   font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Sticky opcional no card da esquerda */
+.card--sticky{
+  position: sticky;
+  top: 92px;
+  align-self: start;
 }
 
 /* =========================
-   FORM
-========================= */
-.form { display: block; }
-.field { margin: 14px 0; }
+   FORMULÁRIO (inputs bonitos)
+   ========================= */
 
-.label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 16px;
-}
-
-.label--small {
-  font-size: 12px;
-  margin-bottom: 6px;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.input {
-  width: 100%;
-  height: 42px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0 12px;
-  outline: none;
-  font-size: 14px;
-}
-
-.input:focus {
-  border-color: rgba(155, 13, 28, 0.55);
-  box-shadow: 0 0 0 4px rgba(155, 13, 28, 0.12);
-}
-
-.hint {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.divider {
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: 16px 0;
-}
-
-/* Chips */
-.value-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.chip {
-  height: 38px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #fff;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.value-cards {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.value-card {
-  text-align: left;
-  border: 1px solid var(--border);
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px;
-  cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.04);
-    position: relative;
-  user-select: none;
-}
-
-.value-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(155, 13, 28, 0.35);
-  box-shadow: 0 10px 18px rgba(0,0,0,0.08);
-}
-
-.value-card__top {
+.campo{
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
-.value-card__badge {
-  font-size: 11px;
+.campo__label{
+  font-size: 13px;
   font-weight: 700;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
   color: var(--text);
+}
+
+.campo__input{
+  width: 100%;
+  height: 46px;
+  padding: 0 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  outline: none;
   background: #fff;
+  font-size: 14px;
 }
 
-.value-card__icon {
-  font-size: 18px;
+.campo__input:focus{
+  border-color: rgba(155,13,28,.45);
+  box-shadow: 0 0 0 4px rgba(155,13,28,.10);
 }
 
-.input--error {
+.campo__ajuda{
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+/* =========================
+   OPÇÕES DE VALOR (botões)
+   ========================= */
+
+.opcoes{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.opcao{
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.opcao:hover{
+  transform: translateY(-1px);
+  border-color: rgba(155, 13, 28, 0.35);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* estado selecionado */
+.opcao.ativa{
   border-color: var(--red);
   box-shadow: 0 0 0 4px rgba(155, 13, 28, 0.12);
 }
 
-.value-card__price {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
+/* =========================
+   RESUMO (lado esquerdo)
+   ========================= */
+
+.resumo{
+  margin-top: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
 }
 
-/* estado selecionado (use a mesma classe do seu JS: is-active) */
-.value-card.is-active {
-  border-color: var(--red);
-  box-shadow: 0 0 0 4px rgba(155, 13, 28, 0.12), 0 12px 20px rgba(0,0,0,0.08);
+.resumo__linha{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--text);
+  font-size: 14px;
 }
 
-.value-card.is-active::before {
-  content: "✓";
-  position: absolute;
-  top: 60px;
-  right: 12px;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
+.resumo__total{
+  border-top: 1px dashed rgba(17,24,39,.15);
+  margin-top: 6px;
+  padding-top: 12px;
+  font-size: 15px;
   font-weight: 900;
-  font-size: 12px;
+}
+
+/* =========================
+   AÇÕES (botões no final)
+   ========================= */
+
+/* empurra os botões pro final do card */
+.acoes{
+  margin-top: auto;
+}
+
+.acoes--coluna{
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* Usa o mesmo padrão de botão do seu CSS (.btn...) */
+.btn{
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.btn:disabled{
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.btn--primary{
   background: var(--red);
   color: #fff;
 }
-
-
-
-@media (max-width: 820px) {
-  .value-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.btn--primary:hover{
+  background: var(--red-dark);
 }
 
-
-.chip:hover { border-color: rgba(155, 13, 28, 0.45); }
-
-.chip.is-active {
-  border-color: var(--red);
-  background: rgba(155, 13, 28, 0.08);
+.btn--ghost{
+  background: #fff;
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn--ghost:hover{
+  border-color: rgba(17, 24, 39, 0.25);
 }
 
-.inline { margin-top: 12px; }
-
-/* Actions */
-.actions {
+/* Se você ainda tiver .actions no HTML, deixa compatível */
+.actions{
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 16px;
 }
+.actions .btn{ flex: 1; min-width: 220px; }
 
-.btn {
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 14px;
+/* =========================
+   TELAS (pagamento e sucesso)
+   ========================= */
+
+.pagamento, .sucesso{
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 10px 20px 40px;
 }
 
-.btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.btn--primary {
-  background: var(--red);
-  color: #fff;
-}
-.btn--primary:hover { background: var(--red-dark); }
-
-.btn--secondary {
-  background: #111827;
-  color: #fff;
-}
-
-.btn--ghost {
-  background: #fff;
-  border-color: var(--border);
-  color: var(--text);
-}
-.btn--ghost:hover { border-color: rgba(17, 24, 39, 0.25); }
-
-/* Alert */
-.alert {
-  margin-top: 14px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(155, 13, 28, 0.25);
-  background: rgba(155, 13, 28, 0.08);
-  color: #6b0a14;
-  font-size: 14px;
-}
-
-/* Result */
-.result-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.result-item {
+.pagamento__card, .sucesso__card{
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.06);
+  padding: 22px;
 }
 
-.result-label {
+.pagamento__titulo, .sucesso__titulo{
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.pagamento__descricao, .sucesso__descricao{
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.pagamento__grid{
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.pagamento__qr{
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  background: #fff;
+  text-align: center;
+}
+
+.pagamento__qr img{
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(17,24,39,.08);
+}
+
+.pagamento__hint{
+  margin: 10px 0 0;
   font-size: 12px;
   color: var(--muted);
-  font-weight: 600;
 }
 
-.result-value {
-  margin-top: 6px;
+.pagamento__box{
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+  background: #fff;
+}
+
+.pagamento__linha{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(17,24,39,.12);
+}
+
+.pagamento__linha:last-child{
+  border-bottom: 0;
+}
+
+.pagamento__acoes{
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.pagamento__acoes .btn{
+  flex: 1;
+  min-width: 220px;
+}
+
+/* TELA DE SUCESSO - estilização */
+.sucesso{
+  width: min(1100px, 100%);
+  margin: 20px auto 0;
+  padding: 0 20px 40px;
+}
+
+.sucesso__card{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.sucesso__titulo{
+  margin: 0;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.4px;
+}
+
+.sucesso__descricao{
+  margin: 6px 0 16px;
+  color: var(--muted);
   font-size: 14px;
+}
+
+/* badge de status */
+.status-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(16,185,129,.25);
+  background: rgba(16,185,129,.10);
+  color: #065f46;
+  font-weight: 800;
+  font-size: 12px;
+  margin: 10px 0 14px;
+}
+
+/* grid mais premium */
+.result-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.result-item{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  background: #fff;
+  box-shadow: 0 6px 14px rgba(0,0,0,.04);
+}
+
+.result-label{
+  font-size: 12px;
+  color: var(--muted);
   font-weight: 700;
 }
 
-.result-value--mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+.result-value{
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text);
 }
 
-.brandWave {
+.result-value--mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  letter-spacing: .2px;
+}
+
+/* botão final mais alinhado */
+.sucesso .actions{
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 980px){
+  .pagamento__grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================
+   ONDA / RODAPÉ
+   ========================= */
+
+/* cards acima */
+.heroCard,
+.compra-grid,
+.pagamento,
+.sucesso{
+  position: relative;
+  z-index: 2;
+}
+
+/* faixa vermelha grande */
+.ondaTakeat{
+  position: relative;
+  z-index: 1;
+  height: 355px;        /* faixa grande igual takeat */
+  margin-top: -260px;   /* sobe pra ficar atrás dos cards */
+  background: var(--red);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* SVG vira o recorte branco no topo */
+.ondaTakeat svg{
+  position: absolute;
+  top: 0;              /* fica colado no topo da faixa */
+  left: 0;
   width: 100%;
-  line-height: 0;
-  margin-top: 12px;      /* menor pra não empurrar pra baixo */
-}
-
-.brandWave svg {
+  height: 180px;       /* tamanho da onda */
   display: block;
-  width: 100%;
-  height: 110px;         /* ajuste da altura da onda */
 }
 
-/* Footer */
-.footer {
+.footer{
   text-align: center;
   color: var(--muted);
   margin-top: 10px;
 }
 
-/* Responsivo */
-@media (max-width: 820px) {
-  .value-grid { grid-template-columns: repeat(2, 1fr); }
-  .result-grid { grid-template-columns: 1fr; }
-  .heroCard__title { font-size: 26px; }
+/* ALERTA BONITO (erros/avisos) */
+.alert{
+  margin-top: 14px;
+  padding: 14px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(155, 13, 28, 0.22);
+  background: rgba(155, 13, 28, 0.08);
+  color: #6b0a14;
+  font-size: 14px;
+  line-height: 1.35;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  box-shadow: 0 10px 22px rgba(0,0,0,.06);
 }
 
-@media (max-width: 720px) {
-  .navbar__content { flex-wrap: wrap; }
-  .topbar__menu {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 12px;
+/* ícone do alerta */
+/* ALERTA COM ÍCONE BONITO */
+.alert::before{
+  content: "\f071"; /* fa-triangle-exclamation */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+
+  font-size: 16px;
+  color: var(--red);
+
+  margin-top: 1px;
+}
+
+/* ALERTA começa sempre invisível */
+.alert[hidden]{
+  display: none !important;
+}
+
+/* só cria ícone quando estiver aparecendo */
+.alert:not([hidden])::before{
+  content: "\f071";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--red);
+  margin-top: 1px;
+}
+
+/* centralizado quando quiser */
+.alert--center{
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* quando for sucesso */
+.alert--success{
+  border-color: rgba(16, 185, 129, .25);
+  background: rgba(16, 185, 129, .10);
+  color: #065f46;
+}
+.alert--success::before{
+  content: "✅";
+}
+
+
+/* =========================
+   RESPONSIVO
+   ========================= */
+
+@media (max-width: 980px){
+  .compra-grid{
+    grid-template-columns: 1fr;
+  }
+  .card--sticky{
+    position: static;
+  }
+  .card{
+    min-height: unset;
+  }
+  .result-grid{
+    grid-template-columns: 1fr;
   }
 }
