@@ -56,6 +56,14 @@ export class GestorController {
          });
       }
 
+      let validadeFinal = validadeEm;
+
+      if (!validadeFinal) {
+      const d = new Date();
+      d.setDate(d.getDate() + 60);
+      validadeFinal = d.toISOString().slice(0, 10);
+      }
+
       // validação simples de data (MVP)
       const regexData = /^\d{4}-\d{2}-\d{2}$/;
       if (!regexData.test(validadeEm)) {
@@ -159,5 +167,10 @@ export class GestorController {
          );
 
       return res.json(restauranteAtualizado);
+   }
+
+   async listarRestaurantes(req: Request, res: Response) {
+      const restaurantes = await restaurantesService.listarTodos();
+      return res.json(restaurantes);
    }
 }

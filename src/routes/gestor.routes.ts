@@ -18,6 +18,9 @@ gestorRoutes.post("/auth/login", async (req, res) => {
 
 gestorRoutes.use(authGestor);
 
+// listar todos restaurantes
+gestorRoutes.get("/restaurantes", controller.listarRestaurantes);
+
 // listar giftcards de um restaurante - gestor
 gestorRoutes.get("/restaurantes/:id/cartoes", controller.listarCartoesPorRestaurante);
 

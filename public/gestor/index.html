@@ -1,107 +1,91 @@
 <!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestor - Login</title>
-  <link rel="stylesheet" href="./css/gestor.css" />
-</head>
-<body>
-  <header class="topo">
-    <div class="container topo__conteudo">
-      <div class="marca">
-        <span class="marca__ponto"></span>
-        <span class="marca__nome">Área do Gestor</span>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor • Login</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+
+  <body>
+    <!-- NAVBAR (igual cliente) -->
+    <header class="navbar">
+      <div class="navbar__content">
+        <!-- Logo -->
+        <div class="logo-area">
+          <a class="topbar__brand" href="../cliente/compra.html">
+            <img
+              src="../cliente/assets/image-removebg-preview.png"
+              class="topbar__logo"
+              alt="Logo"
+            />
+          </a>
+        </div>
+
+        <!-- Menu -->
+        <nav class="menu-area" aria-label="Menu principal">
+          <ul class="topbar__menu">
+            <li><a class="topbar__link" href="../cliente/compra.html">Comprar GiftCard</a></li>
+            <li><a class="topbar__link" href="../cliente/consulta.html">Consultar meu GiftCard</a></li>
+          </ul>
+        </nav>
+
+        <!-- Perfil -->
+        <div class="perfil-area">
+          <a class="icone-perfil" href="../gestor/login.html" title="Área do gestor" aria-label="Área do gestor">
+            <i class="fa-solid fa-user"></i>
+          </a>
+        </div>
       </div>
-      <a class="link" href="/">Voltar</a>
-    </div>
-  </header>
+    </header>
 
-  <main class="container">
-    <section id="tela-login" class="cartao">
-      <h1 class="titulo">Entrar como Gestor</h1>
-      <p class="subtitulo">Use seu e-mail e senha de gestor.</p>
-
-      <form id="form-login" class="formulario">
-        <label class="rotulo">E-mail</label>
-        <input id="email" class="input" type="email" placeholder="gestor@exemplo.com" required />
-
-        <label class="rotulo">Senha</label>
-        <input id="senha" class="input" type="password" placeholder="Sua senha" required />
-
-        <button id="botao-entrar" class="botao botao--primario" type="submit">Entrar</button>
-        <p class="dica" id="mensagem"></p>
-      </form>
+    <!-- HERO -->
+    <section class="heroCard">
+      <div class="heroCard__content">
+        <h1 class="heroCard__title">
+          Entrar como <span class="destaque-vermelho">Gestor</span>
+        </h1>
+        <p class="heroCard__subtitle">
+          Acesse o painel administrativo para gerenciar Gift Cards.
+        </p>
+      </div>
     </section>
 
-    <section id="tela-painel" class="cartao escondido">
-        <div class="linha">
-            <div>
-            <h2 class="titulo2">Painel do Gestor</h2>
-            <p class="subtitulo2" id="gestor-info"></p>
-            </div>
-            <button id="botao-sair" class="botao botao--fantasma">Sair</button>
-        </div>
+    <!-- LOGIN CENTRAL -->
+    <main class="login-wrap">
+      <section id="tela-login" class="card-login" aria-label="Login do gestor">
+        <h2 class="card-login__title">Login do Gestor</h2>
+        <p class="card-login__subtitle">Use seu e-mail e senha cadastrados.</p>
 
-        <div class="caixa" style="margin-top:14px;">
-            <label class="rotulo">ID do Restaurante</label>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <input id="restaurante-id" class="input" placeholder="Ex: 1" />
-            <button id="botao-carregar" class="botao botao--primario" type="button">Carregar cartões</button>
-            </div>
-            <p class="dica">Use o ID do restaurante para listar/criar cartões e atualizar WhatsApp.</p>
-        </div>
+        <form id="form-login" class="form-login">
+          <label class="form-login__label" for="email">E-mail</label>
+          <input id="email" class="form-login__input" type="email" placeholder="gestor@exemplo.com" required />
 
-        <div class="grid" style="margin-top:16px;">
-            <!-- Criar cartão -->
-            <div class="cartao" style="margin-top:0;">
-            <h3 class="titulo3">Criar Gift Card (manual)</h3>
+          <label class="form-login__label" for="senha">Senha</label>
+          <input id="senha" class="form-login__input" type="password" placeholder="Digite sua senha" required />
 
-            <form id="form-criar" class="formulario">
-                <label class="rotulo">Telefone do presenteado</label>
-                <input id="telefone-presenteado" class="input" placeholder="+5511999999999" required />
+          <button id="botao-entrar" class="btn btn--primary btn--full" type="submit">
+            Entrar
+          </button>
 
-                <label class="rotulo">Valor inicial (R$)</label>
-                <input id="valor-inicial" class="input" type="number" min="1" step="0.01" placeholder="Ex: 100" required />
+          <p class="msg" id="mensagem"></p>
+        </form>
+      </section>
+    </main>
 
-                <label class="rotulo">Validade (opcional)</label>
-                <input id="validade-em" class="input" type="date" />
-
-                <label class="rotulo">Código (opcional)</label>
-                <input id="codigo" class="input" placeholder="Deixe vazio para gerar" />
-
-                <button class="botao botao--primario" type="submit">Criar</button>
-                <p class="dica" id="mensagem-criar"></p>
-            </form>
-            </div>
-
-            <!-- Atualizar WhatsApp -->
-            <div class="cartao" style="margin-top:0;">
-            <h3 class="titulo3">WhatsApp do Restaurante</h3>
-
-            <form id="form-whatsapp" class="formulario">
-                <label class="rotulo">WhatsApp</label>
-                <input id="whatsapp" class="input" placeholder="+5511999999999" required />
-                <button class="botao botao--fantasma" type="submit">Atualizar</button>
-                <p class="dica" id="mensagem-whatsapp"></p>
-            </form>
-            </div>
-        </div>
-
-        <!-- Lista -->
-        <div class="cartao" style="margin-top:16px;">
-            <div class="linha" style="align-items:center;">
-            <h3 class="titulo3" style="margin:0;">Cartões do Restaurante</h3>
-            <button id="botao-recarregar" class="botao botao--fantasma" type="button">Recarregar</button>
-            </div>
-
-            <div id="lista" style="margin-top:12px; display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-        </section>
-
-    <div id="toast" class="toast escondido"></div>
-  </main>
-
-  <script src="../gestor/js/gestor.js"></script>
-</body>
+    <script src="./js/script.js"></script>
+  </body>
 </html>
