@@ -66,7 +66,7 @@ export const compraPublicaService = {
       const { data: compraPaga } = await comprasRepo.marcarComoPaga(compraId);
 
       const codigo = await gerarCodigoUnico();
-      const validadeEm = adicionarDiasDataISO(90);
+      const validadeEm = adicionarDiasDataISO(60);
 
       const { data: cartao } = await cartoesRepo.criarCartao({
          restauranteId: compraPaga.restaurante_id,

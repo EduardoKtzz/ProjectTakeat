@@ -12,12 +12,13 @@
 
 * {
    box-sizing: border-box;
-}
+  }
 
 body {
    margin: 0;
    font-family:"Poppins", system-ui, -apple-system,Segoe UI, Roboto, Arial, sans-serif;
    background: var(--bg);
+   overflow: hidden;
 }
 
 /* NAVBAR */
@@ -542,7 +543,7 @@ body {
 .ondaTakeat{
   position: relative;
   z-index: 1;
-  height: 355px;        /* faixa grande igual takeat */
+  height: 555px;        /* faixa grande igual takeat */
   margin-top: -260px;   /* sobe pra ficar atrás dos cards */
   background: var(--red);
   overflow: hidden;

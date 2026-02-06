@@ -11,17 +11,19 @@ export class CartoesService {
     restauranteId: string;
     valor: number;
     telefonePresenteado?: string;
-    validadeEm: string; // obrigatório agora
+    validadeEm?: string; // obrigatório agora
     status: "ativo" | "inativo"; // obrigatório agora
   }) {
     const codigo = this.gerarCodigoCurto();
+
+    const validadeEm =input.validadeEm ?? adicionarDiasDataISO(60); // usa helper
 
     return this.repo.criarCartaoComEmissao({
       restauranteId: input.restauranteId,
       codigo,
       valor: input.valor,
       telefonePresenteado: input.telefonePresenteado ?? null,
-      validadeEm: input.validadeEm,
+      validadeEm,
       status: input.status
     });
   }
@@ -43,4 +45,10 @@ export class CartoesService {
     return this.repo.listarTransacoes(cartaoId);
 }
 
+}
+
+function adicionarDiasDataISO(dias: number): string {
+   const data = new Date();
+   data.setDate(data.getDate() + dias);
+   return data.toISOString().slice(0, 10); // YYYY-MM-DD
 }

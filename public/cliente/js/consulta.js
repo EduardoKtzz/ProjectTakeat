@@ -156,52 +156,65 @@ function normalizarTelefone(valor) {
  * =========================
  */
 
+function formatarDataBR(dataISO) {
+  if (!dataISO) return "—";
+
+  // data vem tipo "2026-02-06"
+  const [ano, mes, dia] = dataISO.split("-");
+
+  return `${dia}-${mes}-${ano}`;
+}
+
 function renderCartoes(cartoes) {
   listaCartoes.innerHTML = "";
 
   cartoes.forEach((c, idx) => {
-    const codigo = c.codigo ?? c.code ?? "-";
+    const codigo = c.codigo ?? c.code ?? c.cartaoCodigo ?? c.cartao_codigo ?? "—";
     const saldo = c.saldo ?? c.balance ?? 0;
-    const status = (c.status ?? "ativo").toString();
-    const validade = c.validade ?? c.expiresAt ?? "—";
+    const status = (c.status ?? c.estado ?? "ativo").toString();
+    const validadeRaw = c.validade_em ?? c.validade ?? c.expiraEm ?? c.expiresAt ?? "";
 
-    const card = document.createElement("div");
-    card.className = "cartao";
+    const validade = formatarDataBR(validadeRaw)
+    const el = document.createElement("div");
+    el.className = "bankcard";
 
-    card.innerHTML = `
-      <div class="cartao__top">
-        <p class="cartao__titulo">Gift Card #${idx + 1}</p>
+    el.innerHTML = `
 
-        <span class="cartao__status">
-          <i class="fa-solid fa-circle-check"></i>
-          ${status}
-        </span>
-      </div>
+      <div class="bankcard__content">
+        <div class="bankcard__top">
+          <div class="bankcard__brand">
 
-      <div class="cartao__grid">
-        <div class="kv">
-          <div class="kv__k">Código</div>
-          <div class="kv__v kv__mono">${codigo}</div>
+            <!-- aqui agora vai SOMENTE o código (no lugar do "Gift Card") -->
+            <div class="bankcard__codeTop">${codigo}</div>
+          </div>
+
+          <div class="bankcard__status">
+            ${status}
+          </div>
         </div>
 
-        <div class="kv">
-          <div class="kv__k">Saldo</div>
-          <div class="kv__v">${formatBRL(saldo)}</div>
-        </div>
+        <!-- chip removido; entra a logo pequena -->
+        <img
+          class="bankcard__logo"
+          src="./assets/image-removebg-preview.png"
+          alt="Logo"
+        />
 
-        <div class="kv">
-          <div class="kv__k">Validade</div>
-          <div class="kv__v">${validade}</div>
-        </div>
+        <div class="bankcard__bottom">
+          <div class="bankcard__meta">
+            <div class="bankcard__label">Validade</div>
+            <div class="bankcard__value">${validade ? validade : "—"}</div>
+          </div>
 
-        <div class="kv">
-          <div class="kv__k">Uso</div>
-          <div class="kv__v">WhatsApp</div>
+          <div class="bankcard__saldo">
+            <div class="bankcard__label">Saldo</div>
+            <div class="bankcard__value">${formatBRL(saldo)}</div>
+          </div>
         </div>
       </div>
     `;
 
-    listaCartoes.appendChild(card);
+    listaCartoes.appendChild(el);
   });
 }
 
@@ -231,7 +244,7 @@ async function requestOtp(telefone) {
   const otpDev = document.getElementById("otp-dev");
   if (otpDev && data?.otp) {
     otpDev.hidden = false;
-    otpDev.textContent = `⚠️ OTP Simulado: ${data.otp}`;
+    otpDev.textContent = `⚠️ Ambiente em Desenvolvimento, simulando envio do código por whatsapp. Em produção é necessario integração - ${data.otp}`;
     elOtp.value = data.otp;
   }
 
