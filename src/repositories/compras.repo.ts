@@ -5,7 +5,7 @@ export const comprasRepo = {
       restauranteId: string;
       valor: number;
       compradorNome?: string | null;
-      compradorTelefone?: string | null;
+      recebedor?: string | null;
       telefonePresenteado: string;
    }) {
       return supabase
@@ -15,7 +15,7 @@ export const comprasRepo = {
             valor: params.valor,
             status: "pendente",
             comprador_nome: params.compradorNome ?? null,
-            comprador_telefone: params.compradorTelefone ?? null,
+            recebedor: params.recebedor ?? null,
             telefone_presenteado: params.telefonePresenteado,
          })
          .select("*")

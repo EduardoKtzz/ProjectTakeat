@@ -22,38 +22,37 @@ async function gerarCodigoUnico(): Promise<string> {
 
 export const compraPublicaService = {
    async criarCompra(params: {
-      restauranteId: string;
-      valor: number;
-      compradorNome?: string;
-      compradorTelefone?: string;
-      telefonePresenteado: string;
-   }) {
-      if (!params.restauranteId) throw new Error("Restaurante inválido.");
-      if (!params.valor || params.valor <= 0)
-         throw new Error("Valor inválido.");
+  restauranteId: string;
+  valor: number;
+  compradorNome?: string;
+  nomePresenteado?: string;
+  telefonePresenteado: string;
+}) {
+  if (!params.restauranteId) throw new Error("Restaurante inválido.");
+  if (!params.valor || params.valor <= 0) throw new Error("Valor inválido.");
 
-      const telefonePresenteado = normalizePhoneBR(params.telefonePresenteado);
-      if (!isValidPhoneBR(telefonePresenteado))
-         throw new Error("Telefone do presenteado inválido.");
+  const telefonePresenteado = normalizePhoneBR(params.telefonePresenteado);
+  if (!isValidPhoneBR(telefonePresenteado))
+    throw new Error("Telefone do presenteado inválido.");
 
-      const telefoneComprador = params.compradorTelefone
-         ? normalizePhoneBR(params.compradorTelefone)
-         : null;
+  const recebedor = params.nomePresenteado ? params.nomePresenteado.trim() : null;
+  const compradorNome = params.compradorNome ? params.compradorNome.trim() : null;
 
-      if (telefoneComprador && !isValidPhoneBR(telefoneComprador))
-         throw new Error("Telefone do comprador inválido.");
+  // (opcional) validações simples de texto
+  if (recebedor && recebedor.length > 80) throw new Error("Nome do recebedor muito longo.");
+  if (compradorNome && compradorNome.length > 80) throw new Error("Nome do comprador muito longo.");
 
-      const { data, error } = await comprasRepo.criarCompra({
-         restauranteId: params.restauranteId,
-         valor: params.valor,
-         compradorNome: params.compradorNome,
-         compradorTelefone: telefoneComprador,
-         telefonePresenteado,
-      });
+  const { data, error } = await comprasRepo.criarCompra({
+    restauranteId: params.restauranteId,
+    valor: params.valor,
+    compradorNome,
+    recebedor,
+    telefonePresenteado,
+  });
 
-      if (error) throw new Error(error.message);
-      return data;
-   },
+  if (error) throw new Error(error.message);
+  return data;
+},
 
    async confirmarPagamento(compraId: string) {
       const { data: compra, error } = await comprasRepo.buscarPorId(compraId);

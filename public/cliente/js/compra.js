@@ -266,7 +266,7 @@ async function criarCompra() {
       restauranteId: RESTAURANTE_ID,
       valor: valid.valor,
       compradorNome: valid.comprador || undefined,
-      recebedorNome: valid.presenteado, // mantém o nome do presenteado
+      nomePresenteado: valid.presenteado, // ✅ agora bate com o service
       telefonePresenteado: valid.telefone
     };
 
