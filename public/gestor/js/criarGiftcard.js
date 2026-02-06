@@ -253,7 +253,7 @@ async function criarGiftCard() {
     el.alert.classList.add("alert--sucesso");
 
     el.alert.hidden = false;
-    el.alert.textContent = `Gift card criado com sucesso! Código: ${result?.codigo || "—"}`;
+    el.alert.textContent = `Gift card criado com sucesso, foi enviado uma confirmação no whatsapp da loja e do recebedor! Código: ${result?.codigo || "—"}`;
     el.alert.scrollIntoView({ behavior: "smooth", block: "start" });
 
     limparForm();

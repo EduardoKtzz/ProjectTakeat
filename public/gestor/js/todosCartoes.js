@@ -1,3 +1,5 @@
+
+
 const API = {
   URL_BASE: "http://localhost:3001",
   PREFIXO: "/api/gestor",
@@ -16,7 +18,7 @@ const CHAVES = {
   email: "gestor_email",
 };
 
-const URL_LOGIN = "./login.html";
+const URL_LOGIN = "../cliente/compra.html";
 
 const el = {
   // cards

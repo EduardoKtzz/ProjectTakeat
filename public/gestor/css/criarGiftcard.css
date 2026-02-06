@@ -242,11 +242,12 @@ body{
   position: relative;
   z-index: 1;
   height: 620px;
-  margin-top: -260px;
+  margin-top: -160px;
   background: var(--red);
   overflow: hidden;
   pointer-events: none;
 }
+
 .ondaTakeat svg{
   position: absolute;
   top: 0; left: 0;
