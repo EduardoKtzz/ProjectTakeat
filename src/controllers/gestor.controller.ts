@@ -49,47 +49,33 @@ export class GestorController {
          });
       }
 
-      // validadeEm obrigatório (YYYY-MM-DD)
-      if (typeof validadeEm !== "string") {
-         return res.status(400).json({
-            error: "Campo 'validadeEm' é obrigatório no formato YYYY-MM-DD.",
-         });
-      }
-
       let validadeFinal = validadeEm;
 
-      if (!validadeFinal) {
+      if (validadeFinal === undefined || validadeFinal === null || validadeFinal === "") {
       const d = new Date();
       d.setDate(d.getDate() + 60);
       validadeFinal = d.toISOString().slice(0, 10);
       }
 
-      // validação simples de data (MVP)
+      // validação simples de data (MVP) — agora valida o validadeFinal
       const regexData = /^\d{4}-\d{2}-\d{2}$/;
-      if (!regexData.test(validadeEm)) {
-         return res.status(400).json({
-            error: "Campo 'validadeEm' deve estar no formato YYYY-MM-DD.",
-         });
-      }
+      if (!regexData.test(validadeFinal)) {
+      return res.status(400).json({
+         error: "Campo 'validadeEm' deve estar no formato YYYY-MM-DD.",
+      });
+   }
 
-      const dataValid = new Date(validadeEm + "T00:00:00");
+      const dataValid = new Date(validadeFinal + "T00:00:00");
       if (Number.isNaN(dataValid.getTime())) {
-         return res
-            .status(400)
-            .json({ error: "Campo 'validadeEm' não é uma data válida." });
+      return res.status(400).json({ error: "Campo 'validadeEm' não é uma data válida." });
       }
 
-      // não permitir data no passado (recomendado)
+
+      // não permitir data no passado
       const hoje = new Date();
-      const hojeZerado = new Date(
-         hoje.getFullYear(),
-         hoje.getMonth(),
-         hoje.getDate(),
-      );
+      const hojeZerado = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
       if (dataValid < hojeZerado) {
-         return res
-            .status(400)
-            .json({ error: "Campo 'validadeEm' não pode ser no passado." });
+      return res.status(400).json({ error: "Campo 'validadeEm' não pode ser no passado." });
       }
 
       const cartao = await service.criarCartaoManual({

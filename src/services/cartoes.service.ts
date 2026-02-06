@@ -10,13 +10,16 @@ export class CartoesService {
   async criarCartaoManual(input: {
     restauranteId: string;
     valor: number;
-    telefonePresenteado?: string;
-    validadeEm?: string; // obrigatório agora
+    telefonePresenteado: string;
+    validadeEm?: string; 
     status: "ativo" | "inativo"; // obrigatório agora
   }) {
     const codigo = this.gerarCodigoCurto();
 
-    const validadeEm =input.validadeEm ?? adicionarDiasDataISO(60); // usa helper
+  const validadeEm =
+    typeof input.validadeEm === "string" && input.validadeEm.trim() !== ""
+      ? input.validadeEm.trim()
+      : adicionarDiasDataISO(60);
 
     return this.repo.criarCartaoComEmissao({
       restauranteId: input.restauranteId,

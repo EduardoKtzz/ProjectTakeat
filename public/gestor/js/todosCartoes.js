@@ -141,11 +141,19 @@ function formatBRL(value) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function formatarDataBR(isoDate) {
+function formatarDataHoraBR(isoDate) {
   if (!isoDate) return "—";
-  const d = String(isoDate).length <= 10 ? new Date(`${isoDate}T00:00:00`) : new Date(isoDate);
+
+  const d = new Date(isoDate);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString("pt-BR");
+
+  return d.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 /**
@@ -200,7 +208,7 @@ function renderizarCartoes(cartoes) {
 
         <div>
           <div class="gcard__label">Validade</div>
-          <div class="gcard__value">${formatarDataBR(c.validade_em || c.validadeEm || c.validade)}</div>
+          <div class="gcard__value">${formatarDataHoraBR(c.validade_em || c.validadeEm || c.validade)}</div>
         </div>
 
         <div class="gcard__actions">
@@ -390,9 +398,21 @@ async function carregarExtrato(cartaoId) {
     el.extratoLista.innerHTML = lista
       .map((t) => {
         // tenta mapear campos comuns
-        const data = formatarDataBR(t.created_at || t.criado_em || t.data);
-        const valor = Number(t.valor ?? t.amount ?? 0);
+        const data = formatarDataHoraBR(
+          t.created_at || t.criado_em || t.data
+        );        
+        let valor = Number(t.valor ?? t.amount ?? 0);
 
+        // regra: abatimento sempre aparece como negativo
+        const tipoRaw = String(t.tipo || "").toLowerCase();
+
+        if (tipoRaw.includes("abat")) {
+          valor = -Math.abs(valor);
+        }
+
+        if (tipoRaw.includes("emis")) {
+          valor = Math.abs(valor);
+        }
         const classe = valor >= 0 ? "positivo" : "negativo";
         const valorFmt = formatBRL(Math.abs(valor));
 

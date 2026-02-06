@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor - Criar Gift Card</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+
+  <link rel="stylesheet" href="./css/criarGiftcard.css" />
+</head>
+
+<body>
+  <!-- NAVBAR GESTOR -->
+  <header class="navbar">
+    <div class="navbar__content">
+
+      <div class="logo-area">
+        <a class="topbar__brand" href="./todosCartoes.html" aria-label="Início Gestor">
+          <img
+            src="../cliente/assets/image-removebg-preview.png"
+            class="topbar__logo"
+            alt="Logo"
+          />
+        </a>
+      </div>
+
+      <nav class="menu-area" aria-label="Menu do gestor">
+        <ul class="topbar__menu">
+          <li><a class="topbar__link" href="./todosCartoes.html">Gift Cards</a></li>
+          <li><a class="topbar__link is-active" href="./criarGiftcard.html">Criar Gift Cards</a></li>
+          <li><a class="topbar__link" href="./whatsappRestaurante.html">WhatsApp Restaurante</a></li>
+        </ul>
+      </nav>
+
+      <div class="perfil-area">
+        <button id="btnSair" class="btn btn--ghost" type="button" title="Sair">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="heroCard">
+    <div class="heroCard__content">
+      <h1 class="heroCard__title">
+        Criar <span class="destaque-vermelho">Gift Card</span>
+      </h1>
+      <p class="heroCard__subtitle">
+        Selecione um restaurante e preencha os dados para criar um novo gift card.
+      </p>
+    </div>
+  </section>
+
+  <main class="wrap">
+
+    <!-- CARD 1: SELEÇÃO (COMEÇA APARECENDO) -->
+    <section id="cardSelect" class="card card--center" aria-label="Selecionar restaurante">
+      <h2 class="card__titulo">Selecionar restaurante</h2>
+      <p class="card__descricao">Escolha um restaurante para criar um gift card.</p>
+
+      <div class="campo">
+        <label class="campo__label" for="selectRestaurante">Restaurante</label>
+        <select id="selectRestaurante" class="campo__input">
+          <option value="">Carregando restaurantes...</option>
+        </select>
+        <small class="campo__ajuda" id="restInfo"></small>
+      </div>
+
+      <div id="alertSelect" class="alert" hidden></div>
+
+      <button id="btnContinuar" class="btn btn--primary btn--full" type="button" disabled>
+        Continuar
+      </button>
+    </section>
+
+    <!-- CARD 2: FORM (COMEÇA ESCONDIDO) -->
+    <section id="cardForm" class="card card--fill" hidden aria-label="Criar gift card">
+      <div class="card__headerRow">
+        <div>
+          <h2 class="card__titulo">Novo Gift Card</h2>
+          <p class="card__descricao" id="nomeRestSelecionado">—</p>
+        </div>
+
+        <div class="card__headerActions">
+          <a class="btn btn--ghost" href="./todosCartoes.html" title="Ver gift cards do restaurante">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Voltar</span>
+          </a>
+
+          <button id="btnTrocarRest" class="btn btn--ghost" type="button">
+            Trocar restaurante
+          </button>
+        </div>
+      </div>
+
+      <div id="alert" class="alert" hidden></div>
+
+      <div id="loading" class="loading" hidden>
+        <div class="spinner"></div>
+        <span>Criando gift card...</span>
+      </div>
+
+      <div class="formGrid">
+
+        <div class="campo">
+          <label class="campo__label" for="valor">Valor (R$)</label>
+          <input id="valor" class="campo__input" type="number" min="1" step="1" placeholder="Ex: 100" />
+          <small class="campo__ajuda">Número maior que 0.</small>
+        </div>
+
+        <div class="campo">
+          <label class="campo__label" for="validadeEm">Validade</label>
+          <input id="validadeEm" class="campo__input" type="date" />
+          <small class="campo__ajuda">Vencimento padrão, vence após 60 dias!</small>
+        </div>
+
+        <div class="campo">
+          <label class="campo__label" for="telefonePresenteado">Telefone do presenteado</label>
+          <input id="telefonePresenteado" class="campo__input" type="text" placeholder="Ex: 5511999999999" />
+          <small class="campo__ajuda">Apenas números (DDI+DDD+número).</small>
+        </div>
+
+        <div class="campo">
+          <label class="campo__label" for="status">Status</label>
+          <select id="status" class="campo__input">
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+          <small class="campo__ajuda">Obrigatório.</small>
+        </div>
+
+      </div>
+
+      <div class="actionsRow">
+        <button id="btnCriar" class="btn btn--primary" type="button">
+          <i class="fa-solid fa-plus"></i>
+          <span>Criar gift card</span>
+        </button>
+
+        <button id="btnLimpar" class="btn btn--ghost" type="button">
+          Limpar
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ONDA -->
+  <section class="ondaTakeat" aria-hidden="true">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path
+        d="M0,55 C240,15 480,95 720,55 C960,15 1200,95 1440,55 L1440,0 L0,0 Z"
+        fill="var(--bg)"
+      />
+    </svg>
+  </section>
+
+  <script src="./js/criarGiftcard.js"></script>
+</body>
+</html>
