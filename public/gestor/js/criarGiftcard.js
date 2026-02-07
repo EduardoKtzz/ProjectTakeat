@@ -293,7 +293,7 @@ async function criarGiftCard() {
       body: payload,
     });
 
-    setAlertSucesso(`Gift card criado com sucesso! Código: ${result?.codigo || "—"}`);
+    setAlertSucesso(`Você presenteou um GiftCard com sucesso! Código: ${result?.codigo || "—"}`);
     el.alert.scrollIntoView({ behavior: "smooth", block: "start" });
 
     limparForm();
