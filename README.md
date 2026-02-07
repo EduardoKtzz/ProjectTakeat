@@ -1,107 +1,59 @@
-# ProjectTakeat — MVP Gift Cards (Cliente + Gestor)
+# MVP — Sistema de Gift Cards Digitais (Takeat)
 
-MVP de **Gift Cards para restaurantes**, com fluxo completo de:
-- autenticação do **cliente via OTP (WhatsApp simulado via fila)**,
-- **painel do gestor** (login, restaurantes, criação e gestão de cartões),
-- **compra pública** e **consulta** com confirmação de pagamento simulada,
-- persistência em **Supabase**.
+Este projeto foi desenvolvido como um **MVP de Gift Cards Digitais**, com foco em validação rápida para restaurantes, seguindo o desafio técnico proposto pela Takeat.
 
-> Objetivo: demonstrar entrega ponta-a-ponta e arquitetura organizada (routes → controllers → services → repositories).
+O sistema permite:
 
----
-
-## 📌 Funcionalidades
-
-### Cliente (público)
-- Solicitar OTP por telefone (BR)
-- Validar OTP e gerar sessão (token Bearer)
-- Listar gift cards do telefone autenticado
-
-### Compra (pública)
-- Criar compra
-- Confirmar pagamento (simulado)
-
-### Gestor (admin)
-- Login com e-mail e senha (bcrypt)
-- Listar restaurantes
-- Listar gift cards por restaurante
-- Criar gift card manualmente
-- Alterar status (ativo/inativo)
-- Abater saldo do gift card (parcial ou total)
-- Listar transações do cartão
-- Atualizar WhatsApp do restaurante
+- Restaurantes criarem e gerenciarem gift cards
+- Clientes comprarem gift cards digitais
+- Clientes consultarem Gift Cards com autenticação via WhatsApp
+- Automação de mensagens via fila de eventos (simulação de WhatsApp)
 
 ---
 
-## 🧱 Stack
-- Node.js + Express + TypeScript
-- Supabase (DB)
-- bcrypt (hash de senha)
-- Autenticação por token Bearer (sessões)
-- Frontend simples em HTML/CSS/JS (pasta `public/`)
+# 🚀 Como rodar o projeto
 
----
+## Pré-requisitos
 
-## 🗂️ Estrutura
-- `src/app.ts` → app Express + rotas + estáticos
-- `src/server.ts` → start do servidor
-- `src/routes/` → rotas do gestor e público/cliente
-- `src/controllers/` → controllers
-- `src/services/` → regras de negócio
-- `src/repositories/` → acesso ao Supabase
-- `public/` → páginas do cliente e gestor (HTML/CSS/JS)
+- Node.js 18+
+- Conta no Supabase (PostgreSQL)
+- Git instalado (opcional)
 
----
+## 1. Instalar dependências
 
-## 🧾 Tabelas no Supabase (referência)
-Este projeto utiliza tabelas como:
-- `usuarios`
-- `restaurantes`
-- `cartoes_presente`
-- `transacoes_cartao_presente`
-- `otp_codes`
-- `sessoes_cliente`
-- `sessoes_gestor`
-- `fila_mensagens`
-- `compras`
+Dentro da pasta do projeto:
 
----
-
-## ⚙️ Variáveis de ambiente
-
-Crie um arquivo `.env` baseado no `.env.example`:
-
-```bash
-PORT=3001
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
-NODE_ENV=development
-SHOW_OTP=true
-```
-
-## ⚙️ Como rodar?
-
-# instalar dependências
+```bash```
 npm install
 
-# rodar em dev (ajuste conforme seu package.json)
+## 2. Configurar variáveis de ambiente
+-PORT=3001
+-SUPABASE_URL=SEU_URL_SUPABASE
+-SUPABASE_ANON_KEY=SUA_ANON_KEY
+-NODE_ENV=development
+-SHOW_OTP=true
+
+## 3. Rodar o projeto
 npm run dev
 
-## 🧪 Roteiro de demo (3–5 minutos)
+Servidor disponível em:
+-API: http://localhost:3001
+-Gestor: http://localhost:3001/gestor
+-Cliente Compra: http://localhost:3001/cliente/compra
+-Cliente Consulta: http://localhost:3001/cliente/consulta
 
-Abrir o cliente
-Acessar http://localhost:3001/cliente/compra (ou telas em public/cliente)
-Solicitar OTP com telefone
-Em dev, o backend retorna o otp (ou você pode consultar a fila)
-Validar OTP
-Enviar OTP e obter token
-Listar gift cards do telefone autenticado
-Abrir o gestor
-Acessar http://localhost:3001/gestor
-Logar
-Listar restaurantes
-Criar gift card para um restaurante
-Voltar ao cliente
-Atualizar listagem e ver o cartão
-(Opcional) testar abatimento e ver transações
+---
 
+## ✅ Requisitos do desafio - Takeat
+
+### 1. Interface Gestor
+O gestor consegue criar, ativar/desativar e abater saldo de gift cards.
+
+![Gestor — Login](public/docs/images/gestor-login.png)
+![Gestor — Lista de Gift Cards](public/docs/images/gestor-listaGiftCard.png)
+
+
+### 2. Interface Cliente — Consulta
+### 3. Interface Cliente — Compra
+### 4. Automações / WhatsApp
+### 5. Uso de IA / Vibe Code
