@@ -3,6 +3,7 @@ import { authGestor } from "../shared/middlewares/authGestor";
 import { authGestorService } from "../services/authGestor.service";
 import { GestorController } from "../controllers/gestor.controller";
 
+
 export const gestorRoutes = Router();
 const controller = new GestorController();
 

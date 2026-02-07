@@ -4,6 +4,8 @@ import cors from "cors";
 import { gestorRoutes } from "./routes/gestor.routes";
 import clienteRoutes from "./routes/public.routes";
 import publicCompraRoutes from "./routes/public.routes";
+import adminRoutes from "./routes/admin.routes";
+import { iniciarWorkerFila } from "./workers/fila.worker";
 
 export const app = express();
 
@@ -23,6 +25,8 @@ app.use("/api/cliente", clienteRoutes);
 
 app.use("/api/public", publicCompraRoutes);
 
+app.use("/api/admin", adminRoutes);
+
 
 /**
  * Rotas amigáveis (opcional, mas ajuda no demo)
@@ -38,3 +42,6 @@ app.get("/cliente/compra", (_req, res) => {
 app.get("/gestor", (_req, res) => {
   res.sendFile(path.join(publicDir, "gestor", "index.html"));
 });
+
+
+iniciarWorkerFila();

@@ -1,6 +1,7 @@
 import { CartoesRepo } from "../repositories/cartoes.repo";
 import { filaMensagensRepo } from "../repositories/filaMensagens.repo";
 import { restaurantesRepo } from "../repositories/restaurantes.repo";
+import { transacoesRepo } from "../repositories/transacoes.repo";
 
 export class CartoesService {
   private repo = new CartoesRepo();
@@ -13,22 +14,27 @@ export class CartoesService {
     restauranteId: string;
     valor: number;
     telefonePresenteado?: string;
-    validadeEm: string; // ✅ YYYY-MM-DD sempre chega aqui
+    validadeEm: string; // YYYY-MM-DD
     status: "ativo" | "inativo";
   }) {
     const codigo = this.gerarCodigoCurto();
 
-    // ✅ Aqui: validadeEm é YYYY-MM-DD e a coluna no Supabase é DATE
     const cartao = await this.repo.criarCartaoComEmissao({
       restauranteId: input.restauranteId,
       codigo,
       valor: input.valor,
       telefonePresenteado: input.telefonePresenteado,
-      validadeEm: input.validadeEm, // ✅ salva direto
+      validadeEm: input.validadeEm,
       status: input.status,
     });
 
-    // Mensagens (se você usa)
+    // ✅ REGISTRAR EMISSÃO NO EXTRATO (AGORA CERTO)
+    await transacoesRepo.registrarTransacao({
+      cartaoId: cartao.id,
+      tipo: "emissao",
+      valor: input.valor,
+    });
+
     if (input.telefonePresenteado) {
       await filaMensagensRepo.enqueue({
         restauranteId: input.restauranteId,
@@ -72,7 +78,7 @@ export class CartoesService {
     return this.repo.abaterPorFuncaoSQL(cartaoId, valor);
   }
 
-  async listarTransacoes(cartaoId: string) {
-    return this.repo.listarTransacoes(cartaoId);
-  }
+async listarTransacoes(cartaoId: string) {
+  return transacoesRepo.listarPorCartao(cartaoId);
+}
 }
