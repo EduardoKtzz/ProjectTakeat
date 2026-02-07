@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import { CartoesService } from "../services/cartoes.service";
 import { RestaurantesService } from "../services/restaurantes.service";
+import { DashboardRepository } from "../repositories/dashboard.repository";
 
 const cartoesService = new CartoesService();
 const restaurantesService = new RestaurantesService();
 
 export class GestorController {
+    private dashboardRepo = new DashboardRepository();
+
   async listarCartoesPorRestaurante(req: Request, res: Response) {
     const restauranteId = req.params.id;
     const cartoes = await cartoesService.listarPorRestaurante(restauranteId);
@@ -138,4 +141,21 @@ export class GestorController {
     const restaurantes = await restaurantesService.listarTodos();
     return res.json(restaurantes);
   }
+async dashboardRestaurante(req: Request, res: Response) {
+    try {
+      const restauranteId = req.params.id;
+
+      if (!restauranteId) {
+        return res
+          .status(400)
+          .json({ error: "Parâmetro :id (restauranteId) é obrigatório." });
+      }
+
+      const metrics = await this.dashboardRepo.getMetricsByRestauranteId(restauranteId);
+      return res.json(metrics);
+    } catch (e: any) {
+      return res.status(500).json({ error: e?.message || "Erro interno." });
+    }
+  }
+
 }

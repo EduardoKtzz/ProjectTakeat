@@ -1,47 +1,28 @@
 import { supabase } from "../config/supabase";
 
-class TransacoesRepo {
-  /**
-   * Registra uma transação no extrato do gift card
-   * Tipos permitidos:
-   * - emissao
-   * - abatimento
-   */
-  async registrarTransacao(input: {
-    cartaoId: string;
-    tipo: "emissao" | "abatimento";
-    valor: number;
-  }) {
-    const { data, error } = await supabase
-      .from("transacoes_cartao_presente")
-      .insert([
-        {
-          // ✅ COLUNA CERTA DO SEU BANCO
-          cartao_presente_id: input.cartaoId,
-
-          tipo: input.tipo,
-          valor: input.valor,
-        },
-      ])
-      .select("*")
-      .single();
-
-    if (error) throw new Error(error.message);
-    return data;
+export class TransacoesRepo {
+  async criarEmissao(params: { cartaoId: string; valor: number }) {
+    return supabase.from("transacoes").insert({
+      cartao_id: params.cartaoId,
+      tipo: "emissao",
+      valor: params.valor,
+    });
   }
 
-  /**
-   * Lista extrato completo de um cartão
-   */
-  async listarPorCartao(cartaoId: string) {
-    const { data, error } = await supabase
-      .from("transacoes_cartao_presente")
-      .select("*")
-      .eq("cartao_presente_id", cartaoId)
-      .order("criado_em", { ascending: false });
+  async criarAbatimento(params: { cartaoId: string; valor: number }) {
+    return supabase.from("transacoes").insert({
+      cartao_id: params.cartaoId,
+      tipo: "abatimento",
+      valor: -Math.abs(params.valor),
+    });
+  }
 
-    if (error) throw new Error(error.message);
-    return data ?? [];
+  async listarPorCartao(cartaoId: string) {
+    return supabase
+      .from("transacoes")
+      .select("*")
+      .eq("cartao_id", cartaoId)
+      .order("created_at", { ascending: false });
   }
 }
 

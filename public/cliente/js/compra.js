@@ -1,18 +1,3 @@
-// ======================================================
-// TELA DE COMPRA - MVP GIFT CARDS
-// - Cria compra (pendente)
-// - Mostra tela de pagamento (simulado)
-// - Confirma pagamento (simulado) e exibe sucesso
-//
-// MELHORIAS APLICADAS NESTA VERSÃO:
-// ✅ Máscara de telefone no campo telefonePresenteado
-// ✅ Normalização e envio do telefone no padrão WhatsApp (E.164): +55DDDNÚMERO
-// ✅ Correção de bug: "campoTelefone" não existia no seu código
-// ✅ Validação coerente (usuário digita (DD) 9XXXX-XXXX e sistema envia +55...)
-// ✅ Evita erro de duplicar 55 (se usuário colar 5511... nós tratamos)
-// ======================================================
-
-
 // =========================
 // VARIAVEIS DA API
 // =========================
@@ -437,7 +422,8 @@ async function confirmarPagamentoSimulado() {
     const dados = await resposta.json().catch(() => ({}));
 
     if (!resposta.ok) {
-      throw new Error(dados?.error || "Falha ao confirmar pagamento");
+      console.log("ERRO CONFIRMAR:", resposta.status, dados);
+      throw new Error(dados?.error || dados?.message || "Falha ao confirmar pagamento");
     }
 
     mostrarTelaSucessoComResultado(dados);

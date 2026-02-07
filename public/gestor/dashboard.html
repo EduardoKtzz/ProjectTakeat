@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestor - Criar Gift Card</title>
+  <title>Gestor - Dashboard</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,11 +17,11 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
 
-  <link rel="stylesheet" href="./css/criarGiftcard.css" />
+  <link rel="stylesheet" href="./css/dashboard.css" />
 </head>
 
 <body>
-  <!-- NAVBAR GESTOR -->
+  <!-- NAVBAR GESTOR (mesmo padrão) -->
   <header class="navbar">
     <div class="navbar__content">
 
@@ -38,8 +38,8 @@
       <nav class="menu-area" aria-label="Menu do gestor">
         <ul class="topbar__menu">
           <li><a class="topbar__link" href="./todosCartoes.html">Gift Cards</a></li>
-          <li><a class="topbar__link is-active" href="./criarGiftcard.html">Criar Gift Cards</a></li>
-          <li><a class="topbar__link" href="./dashboard.html">Dashboard</a></li>
+          <li><a class="topbar__link" href="./criarGiftcard.html">Criar Gift Cards</a></li>
+          <li><a class="topbar__link is-active" href="./dashboard.html">Dashboard</a></li>
         </ul>
       </nav>
 
@@ -57,20 +57,19 @@
   <section class="heroCard">
     <div class="heroCard__content">
       <h1 class="heroCard__title">
-        Criar <span class="destaque-vermelho">Gift Card</span>
+        Dash<span class="destaque-vermelho">board</span>
       </h1>
       <p class="heroCard__subtitle">
-        Selecione um restaurante e preencha os dados para criar um novo gift card.
+        Selecione um restaurante para visualizar os números gerais.
       </p>
     </div>
   </section>
 
   <main class="wrap">
-
-    <!-- CARD 1: SELEÇÃO (COMEÇA APARECENDO) -->
+    <!-- CARD 1: SELEÇÃO -->
     <section id="cardSelect" class="card card--center" aria-label="Selecionar restaurante">
       <h2 class="card__titulo">Selecionar restaurante</h2>
-      <p class="card__descricao">Escolha um restaurante para criar um gift card.</p>
+      <p class="card__descricao">Escolha um restaurante para carregar as métricas.</p>
 
       <div class="campo">
         <label class="campo__label" for="selectRestaurante">Restaurante</label>
@@ -87,19 +86,19 @@
       </button>
     </section>
 
-    <!-- CARD 2: FORM (COMEÇA ESCONDIDO) -->
-    <section id="cardForm" class="card card--fill" hidden aria-label="Criar gift card">
+    <!-- CARD 2: DASHBOARD (começa escondido) -->
+    <section id="cardDashboard" class="card card--fill" hidden aria-label="Dashboard do restaurante">
       <div class="card__headerRow">
         <div>
-          <h2 class="card__titulo">Novo Gift Card</h2>
+          <h2 class="card__titulo">Dashboard do Restaurante</h2>
           <p class="card__descricao" id="nomeRestSelecionado">—</p>
         </div>
 
         <div class="card__headerActions">
-          <a class="btn btn--ghost" href="./todosCartoes.html" title="Ver gift cards do restaurante">
-            <i class="fa-solid fa-arrow-left"></i>
-            <span>Voltar</span>
-          </a>
+          <button id="btnRecarregar" class="btn btn--ghost" type="button" title="Recarregar métricas">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Recarregar</span>
+          </button>
 
           <button id="btnTrocarRest" class="btn btn--ghost" type="button">
             Trocar restaurante
@@ -111,53 +110,47 @@
 
       <div id="loading" class="loading" hidden>
         <div class="spinner"></div>
-        <span>Criando gift card...</span>
+        <span>Carregando métricas...</span>
       </div>
 
-      <div class="formGrid">
+      <div id="metricsGrid" class="statsGrid" hidden>
+        <article class="statCard">
+          <div class="statCard__icon"><i class="fa-solid fa-ticket"></i></div>
+          <div class="statCard__label">Total de gift cards</div>
+          <div class="statCard__value" id="m_cards">—</div>
+          <div class="statCard__hint">Cadastrados no restaurante</div>
+        </article>
 
-        <div class="campo">
-          <label class="campo__label" for="valor">Valor (R$)</label>
-          <input id="valor" class="campo__input" type="number" min="1" step="1" placeholder="Ex: 100" />
-          <small class="campo__ajuda">Número maior que 0.</small>
-        </div>
+        <article class="statCard">
+          <div class="statCard__icon"><i class="fa-solid fa-bag-shopping"></i></div>
+          <div class="statCard__label">Compras</div>
+          <div class="statCard__value" id="m_purchases">—</div>
+          <div class="statCard__hint">Compras/pedidos registrados</div>
+        </article>
 
-        <div class="campo">
-          <label class="campo__label" for="validadeEm">Validade</label>
-          <input id="validadeEm" class="campo__input" type="date" />
-          <small class="campo__ajuda">Vencimento padrão, vence após 60 dias!</small>
-        </div>
+        <article class="statCard">
+          <div class="statCard__icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="statCard__label">Mensagens WhatsApp</div>
+          <div class="statCard__value" id="m_whatsapp">—</div>
+          <div class="statCard__hint">Enviadas pela automação/fila</div>
+        </article>
 
-        <div class="campo">
-          <label class="campo__label" for="telefonePresenteado">Telefone do presenteado</label>
-          <input id="telefonePresenteado" class="campo__input" type="text" placeholder="Ex: 5511999999999" />
-          <small class="campo__ajuda">Apenas números (DDD+número).</small>
-        </div>
-
-        <div class="campo">
-          <label class="campo__label" for="status">Status</label>
-          <select id="status" class="campo__input">
-            <option value="ativo">Ativo</option>
-            <option value="inativo">Inativo</option>
-          </select>
-          <small class="campo__ajuda">Obrigatório.</small>
-        </div>
-
+        <article class="statCard">
+          <div class="statCard__icon"><i class="fa-solid fa-minus"></i></div>
+          <div class="statCard__label">Usos / Abatimentos</div>
+          <div class="statCard__value" id="m_uses">—</div>
+          <div class="statCard__hint">Movimentações de débito</div>
+        </article>
       </div>
 
-      <div class="actionsRow">
-        <button id="btnCriar" class="btn btn--primary" type="button">
-          <i class="fa-solid fa-plus"></i>
-          <span>Criar gift card</span>
-        </button>
-
-        <button id="btnLimpar" class="btn btn--ghost" type="button">
-          Limpar
-        </button>
+      <div id="empty" class="empty" hidden>
+        <i class="fa-regular fa-face-smile"></i>
+        <div>
+          <strong>Nenhuma métrica disponível</strong>
+          <p>Selecione outro restaurante ou verifique o endpoint do dashboard.</p>
+        </div>
       </div>
-
     </section>
-
   </main>
 
   <!-- ONDA -->
@@ -170,6 +163,6 @@
     </svg>
   </section>
 
-  <script src="./js/criarGiftcard.js"></script>
+  <script src="./js/dashboard.js"></script>
 </body>
 </html>

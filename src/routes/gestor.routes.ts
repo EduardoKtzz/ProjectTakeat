@@ -3,7 +3,6 @@ import { authGestor } from "../shared/middlewares/authGestor";
 import { authGestorService } from "../services/authGestor.service";
 import { GestorController } from "../controllers/gestor.controller";
 
-
 export const gestorRoutes = Router();
 const controller = new GestorController();
 
@@ -40,4 +39,4 @@ gestorRoutes.get("/cartoes/:id/transacoes", controller.listarTransacoes);
 // atualizar o número de whatsapp do restaurante
 gestorRoutes.patch("/restaurantes/:id/whatsapp", controller.atualizarWhatsappRestaurante);
 
-
+gestorRoutes.get("/restaurantes/:id/dashboard", controller.dashboardRestaurante);
