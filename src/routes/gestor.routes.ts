@@ -39,4 +39,8 @@ gestorRoutes.get("/cartoes/:id/transacoes", controller.listarTransacoes);
 // atualizar o número de whatsapp do restaurante
 gestorRoutes.patch("/restaurantes/:id/whatsapp", controller.atualizarWhatsappRestaurante);
 
-gestorRoutes.get("/restaurantes/:id/dashboard", controller.dashboardRestaurante);
+gestorRoutes.get(
+  "/restaurantes/:id/dashboard",
+  authGestor,
+  (req, res) => controller.dashboardRestaurante(req, res)
+);
