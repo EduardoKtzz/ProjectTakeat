@@ -60,7 +60,7 @@ Servidor disponível em:
 
 -Cliente Compra: http://localhost:3001/cliente/compra
 
--Cliente Consulta: http://localhost:3001/cliente/consulta
+-Cliente Consulta: http://localhost:3001/cliente/consulta.html
 
 ---
 
